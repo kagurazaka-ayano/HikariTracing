@@ -34,7 +34,7 @@ namespace MathUtil {
 
         Vec3 operator-() const;
 
-        Vec3 operator-(const Vec3 &other);
+        Vec3 operator-(const Vec3 &other) const;
 
         Vec3 operator+(const Vec3 &other) const;
 
@@ -52,14 +52,20 @@ namespace MathUtil {
 
         [[nodiscard]] double length() const;
 
-        double dot(const Vec3 &other) const;
+        [[nodiscard]] double dot(const Vec3 &other) const;
 
-        Vec3 cross(const Vec3 &other) const;
+        [[nodiscard]] Vec3 cross(const Vec3 &other) const;
 
-        Vec3 unit() const;
+        [[nodiscard]] Vec3 unit() const;
+
+        [[nodiscard]] operator std::string() const;
     };
 
     std::ostream &operator<<(std::ostream &out, const Vec3 &other);
+
+    inline Vec3 operator*(double t, const Vec3 &v) {
+        return {t*v.x, t*v.y, t*v.z};
+    }
 
     using Point3 = Vec3;
 
@@ -68,7 +74,7 @@ namespace MathUtil {
         Point3 position;
         Vec3 direction;
     public:
-        Ray(const Vec3 &pos, const Vec3 &dir);
+        Ray(Vec3 pos, Vec3 dir);
 
         Vec3 pos() const;
         Vec3 dir() const;

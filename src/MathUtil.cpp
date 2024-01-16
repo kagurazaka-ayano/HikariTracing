@@ -7,6 +7,8 @@
 
 #include "MathUtil.h"
 
+#include <utility>
+
 namespace MathUtil{
 
     Vec3::Vec3(double x, double y, double z): x(x), y(y), z(z) {
@@ -44,7 +46,7 @@ namespace MathUtil{
         return arr[i];
     }
 
-    Vec3 Vec3::operator-(const Vec3 &other) {
+    Vec3 Vec3::operator-(const Vec3 &other) const {
         return {x - other.x, y - other.y, z - other.z};
     }
 
@@ -107,15 +109,19 @@ namespace MathUtil{
     }
 
     std::string Vec3::makeColor() const {
-        return fmt::format("{} {} {}\n", static_cast<int>(x), static_cast<int>(y), static_cast<int>(z));
+        return fmt::format("{} {} {}\n", static_cast<int>(x * 255.999), static_cast<int>(y * 255.999), static_cast<int>(z * 255.999));
+    }
+
+    Vec3::operator std::string() const {
+        return fmt::format("Vec3: {:.6f} {:.6f} {:.6f}", x, y, z);
     }
 
     std::ostream& operator<<(std::ostream &out, const Vec3 &other) {
-        out << other.x << " " << other.y << " " << other.z;
+        out << "Vec3: " << other.x << " " << other.y << " " << other.z;
         return out;
     }
 
-    Ray::Ray(const MathUtil::Vec3 &pos, const MathUtil::Vec3 &dir) : position(pos), direction(dir) {
+    Ray::Ray(MathUtil::Vec3 pos, MathUtil::Vec3 dir) : position(std::move(pos)), direction(std::move(dir)) {
 
     }
 

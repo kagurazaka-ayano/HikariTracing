@@ -12,6 +12,7 @@
 #include <vector>
 #include <tuple>
 #include <sstream>
+#include <sys/stat.h>
 #include "MathUtil.h"
 #include "spdlog/spdlog.h"
 
