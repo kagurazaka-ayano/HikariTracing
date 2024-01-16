@@ -17,7 +17,7 @@
 
 namespace ImageUtil {
 
-    using Color = Vec3;
+    using Color = MathUtil::Vec3;
 
     void makePPM(int width, int height, std::vector<std::vector<Color>> img, const std::string &path,
                  const std::string &name);

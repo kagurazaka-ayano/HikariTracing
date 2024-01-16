@@ -3,7 +3,7 @@
 #include <vector>
 
 int main() {
-    int width = 256, height = 256;
+    int width = 256, height = 144;
     int r = 0, g = 0, b = 0;
     auto img = std::vector<std::vector<ImageUtil::Color>>();
     for (int i = 0; i < height; ++i) {
