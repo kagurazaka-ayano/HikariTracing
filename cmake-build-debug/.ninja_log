@@ -1,5 +1,0 @@
-# ninja log v5
-0	254	1705376815772172484	CMakeFiles/OneWeekend.dir/main.cpp.o	33b1ab676778b07e
-940	991	1705385669915639626	OneWeekend	793dfb2b60bf4752
-5	940	1705385669861713357	CMakeFiles/OneWeekend.dir/src/main.cpp.o	dd9e7277bc153f41
-4	1584	1705385632731080689	CMakeFiles/OneWeekend.dir/src/ImageUtil.cpp.o	5d2a2dc29c99a136

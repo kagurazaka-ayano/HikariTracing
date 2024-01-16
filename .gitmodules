@@ -1,0 +1,3 @@
+[submodule "RayTracingOneWeekendNote"]
+	path = RayTracingOneWeekendNote
+	url = git@github.com-ayano:kagurazaka-ayano/RayTracingOneWeekendNote.git
