@@ -1,0 +1,3 @@
+/Users/ayano/Documents/developing/Learn/ComputerGraphics/Raytracing/OneWeekend/cmake-build-debug/CMakeFiles/OneWeekend.dir
+/Users/ayano/Documents/developing/Learn/ComputerGraphics/Raytracing/OneWeekend/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/ayano/Documents/developing/Learn/ComputerGraphics/Raytracing/OneWeekend/cmake-build-debug/CMakeFiles/rebuild_cache.dir
