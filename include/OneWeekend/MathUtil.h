@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <cmath>
+#include "spdlog/fmt/fmt.h"
 
 class Vec3 {
 public:
@@ -17,24 +18,29 @@ public:
     Vec3(double x, double y, double z);
     Vec3(const Vec3& other);
     Vec3(Vec3&& other) noexcept;
-    double x() const noexcept;
-    double y() const noexcept;
-    double z() const noexcept;
+    [[nodiscard]] std::string makeColor() const;
 
     Vec3& operator=(const Vec3& other);
-    double operator[]() const;
-    double operator[]();
+    double operator[](int i) const;
+    double operator[](int i);
 
     Vec3 operator-() const;
+    Vec3 operator-(const Vec3& other);
+    Vec3 operator+(const Vec3& other) const;
+    Vec3 operator*(double t) const;
+    Vec3 operator/(double t) const;
     Vec3& operator+=(const Vec3& other);
     Vec3& operator*=(double t);
     Vec3& operator/=(double t);
-    double lengthSq() const;
 
-    double length() const;
-
-
-
+    [[nodiscard]] double lengthSq() const;
+    [[nodiscard]] double length() const;
+    double dot(const Vec3& other) const;
+    Vec3 cross(const Vec3& other) const;
+    Vec3 unit() const;
 };
+std::ostream& operator<<(std::ostream &out, const Vec3& other);
+
+
 
 #endif //ONEWEEKEND_MATHUTIL_H
