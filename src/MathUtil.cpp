@@ -76,7 +76,7 @@ namespace MathUtil{
     }
 
     double Vec3::length() const {
-        return sqrt(lengthSq());
+        return std::sqrt(lengthSq());
     }
 
     Vec3 Vec3::operator-() const {
@@ -114,6 +114,10 @@ namespace MathUtil{
 
     Vec3::operator std::string() const {
         return fmt::format("Vec3: {:.6f} {:.6f} {:.6f}", x, y, z);
+    }
+
+    Vec3::Vec3(): Vec3(0, 0, 0) {
+
     }
 
     std::ostream& operator<<(std::ostream &out, const Vec3 &other) {

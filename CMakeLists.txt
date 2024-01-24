@@ -3,6 +3,7 @@ project(OneWeekend)
 
 set(CMAKE_CXX_STANDARD 23)
 
+
 file(GLOB SRC "./src/*.cpp")
 set(INCLUDE_SELF "./include/OneWeekend/")
 set(INCLUDE_THIRDPARTIES "./thirdparties/include")

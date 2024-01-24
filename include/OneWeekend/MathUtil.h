@@ -22,6 +22,8 @@ namespace MathUtil {
 
         Vec3(const Vec3 &other);
 
+        Vec3();
+
         Vec3(Vec3 &&other) noexcept;
 
         [[nodiscard]] std::string makeColor() const;
