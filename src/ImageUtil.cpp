@@ -6,6 +6,7 @@
 */
 
 #include "ImageUtil.h"
+#include "GlobUtil.hpp"
 
 namespace ImageUtil{
     void makePPM(int width, int height, std::vector<std::vector<Color>> img, const std::string &path,

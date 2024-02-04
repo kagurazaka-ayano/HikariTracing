@@ -7,8 +7,6 @@
 
 #include "MathUtil.h"
 
-#include <utility>
-
 namespace MathUtil{
 
     Vec3::Vec3(double x, double y, double z): x(x), y(y), z(z) {
@@ -119,8 +117,38 @@ namespace MathUtil{
     Vec3::Vec3(): Vec3(0, 0, 0) {
 
     }
+	Vec3 Vec3::random() {
+		return {randomDouble(), randomDouble(), randomDouble()};
+	}
 
-    std::ostream& operator<<(std::ostream &out, const Vec3 &other) {
+	Vec3 Vec3::random(double min, double max) {
+		return Vec3(randomDouble(min, max), randomDouble(min, max), randomDouble(min, max));
+	}
+
+	Vec3 Vec3::randomVec3InUnitSphere() {
+		while (true) {
+			auto p = Vec3::random(-1, 1);
+			if (p.lengthSq() >= 1) continue;
+			return p;
+		}
+	}
+
+	Vec3 Vec3::randomUnitVec3() {
+		return randomVec3InUnitSphere().unit();
+	}
+
+	Vec3 Vec3::randomUnitVec3InHemiSphere(const Vec3 &normal) {
+		Vec3 in_unit_sphere = randomVec3InUnitSphere();
+		if (in_unit_sphere.dot(normal) > 0.0) {
+			return in_unit_sphere;
+		}
+		else {
+			return -in_unit_sphere;
+		}
+	}
+
+
+	std::ostream& operator<<(std::ostream &out, const Vec3 &other) {
         out << "Vec3: " << other.x << " " << other.y << " " << other.z;
         return out;
     }
@@ -140,6 +168,18 @@ namespace MathUtil{
     Vec3 Ray::pos() const {
         return position;
     }
+	Interval::Interval() : min(-INF), max(INF) {
+
+	}
+	Interval::Interval(double min, double max): min(min), max(max) {
+
+	}
+	bool Interval::within(double x) const {
+		return (min <= x) && (x <= max);
+	}
+	bool Interval::surround(double x) const {
+		return (min < x) && (x < max);
+	}
 
 }
 

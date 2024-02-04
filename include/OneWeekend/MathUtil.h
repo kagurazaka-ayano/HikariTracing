@@ -10,7 +10,9 @@
 
 #include <iostream>
 #include <cmath>
+#include <random>
 #include "spdlog/fmt/fmt.h"
+#include "GlobUtil.hpp"
 
 namespace MathUtil {
 
@@ -61,6 +63,17 @@ namespace MathUtil {
         [[nodiscard]] Vec3 unit() const;
 
         [[nodiscard]] operator std::string() const;
+
+		static Vec3 random();
+
+		static Vec3 random(double min, double max);
+
+		static Vec3 randomVec3InUnitSphere();
+
+		static Vec3 randomUnitVec3InHemiSphere(const Vec3 &normal);
+
+		static Vec3 randomUnitVec3();
+
     };
 
     std::ostream &operator<<(std::ostream &out, const Vec3 &other);
@@ -83,6 +96,33 @@ namespace MathUtil {
 
         Point3 at(double t) const;
     };
+
+	class Interval {
+	public:
+		double min, max;
+		Interval();
+		Interval(double min, double max);
+
+		bool within(double x) const;
+
+		bool surround(double x) const;
+
+		static const Interval empty, universe;
+
+	};
+	const static Interval empty(+INF, -INF);
+	const static Interval universe(-INF, +INF);
+
+	inline double randomDouble() {
+		static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+		static std::mt19937 generator;
+		return distribution(generator);
+	}
+
+	inline double randomDouble(double min, double max) {
+		return min + (max - min) * randomDouble();
+	}
+
 }
 
 #endif //ONEWEEKEND_MATHUTIL_H
