@@ -15,14 +15,11 @@
 #include <sys/stat.h>
 #include "MathUtil.h"
 #include "spdlog/spdlog.h"
+using Color = Vec3;
 
-namespace ImageUtil {
+double gammaCorrect(double c);
 
-    using Color = MathUtil::Vec3;
-
-    void makePPM(int width, int height, std::vector<std::vector<Color>> img, const std::string &path,
-                 const std::string &name);
-
-}
+void makePPM(int width, int height, std::vector<std::vector<Color>> img, const std::string &path,
+			 const std::string &name);
 
 #endif //ONEWEEKEND_IMAGEUTIL_H

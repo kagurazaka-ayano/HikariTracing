@@ -12,7 +12,7 @@
 
 const double PI = 3.1415926;
 const double INF = std::numeric_limits<double>::infinity();
-const double EPS = 1e-6;
+const double EPS = 1e-3;
 
 
 inline double deg2Rad(double deg) {

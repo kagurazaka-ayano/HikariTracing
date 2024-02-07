@@ -14,115 +14,125 @@
 #include "spdlog/fmt/fmt.h"
 #include "GlobUtil.hpp"
 
-namespace MathUtil {
 
-    class Vec3 {
-    public:
-        double x, y, z;
+class Vec3 {
+public:
+	double x, y, z;
 
-        Vec3(double x, double y, double z);
+	Vec3(double x, double y, double z);
 
-        Vec3(const Vec3 &other);
+	Vec3(const Vec3 &other);
 
-        Vec3();
+	Vec3();
 
-        Vec3(Vec3 &&other) noexcept;
+	Vec3(Vec3 &&other) noexcept;
 
-        [[nodiscard]] std::string makeColor() const;
+	[[nodiscard]] std::string makeColor() const;
 
-        Vec3 &operator=(const Vec3 &other);
+	Vec3 &operator=(const Vec3 &other);
 
-        double operator[](int i) const;
+	double operator[](int i) const;
 
-        double operator[](int i);
+	double operator[](int i);
 
-        Vec3 operator-() const;
+	Vec3 operator-() const;
 
-        Vec3 operator-(const Vec3 &other) const;
+	Vec3 operator-(const Vec3 &other) const;
 
-        Vec3 operator+(const Vec3 &other) const;
+	Vec3 operator+(const Vec3 &other) const;
 
-        Vec3 operator*(double t) const;
+	Vec3 operator*(double t) const;
 
-        Vec3 operator/(double t) const;
+	Vec3 operator/(double t) const;
 
-        Vec3 &operator+=(const Vec3 &other);
+	Vec3 &operator+=(const Vec3 &other);
 
-        Vec3 &operator*=(double t);
+	Vec3 &operator*=(double t);
 
-        Vec3 &operator/=(double t);
+	Vec3 &operator*(const Vec3 &other);
 
-        [[nodiscard]] double lengthSq() const;
+	Vec3 &operator/=(double t);
 
-        [[nodiscard]] double length() const;
+	[[nodiscard]] double lengthSq() const;
 
-        [[nodiscard]] double dot(const Vec3 &other) const;
+	[[nodiscard]] double length() const;
 
-        [[nodiscard]] Vec3 cross(const Vec3 &other) const;
+	[[nodiscard]] double dot(const Vec3 &other) const;
 
-        [[nodiscard]] Vec3 unit() const;
+	[[nodiscard]] Vec3 cross(const Vec3 &other) const;
 
-        [[nodiscard]] operator std::string() const;
+	[[nodiscard]] Vec3 unit() const;
 
-		static Vec3 random();
+	[[nodiscard]] operator std::string() const;
 
-		static Vec3 random(double min, double max);
+	static Vec3 random();
 
-		static Vec3 randomVec3InUnitSphere();
+	static Vec3 random(double min, double max);
 
-		static Vec3 randomUnitVec3InHemiSphere(const Vec3 &normal);
+	static Vec3 randomVec3InUnitSphere();
 
-		static Vec3 randomUnitVec3();
+	static Vec3 randomUnitVec3InHemiSphere(const Vec3 &normal);
 
-    };
+	static Vec3 randomUnitVec3();
 
-    std::ostream &operator<<(std::ostream &out, const Vec3 &other);
+	static Vec3 reflect(const Vec3 &v, const Vec3 &n);
 
-    inline Vec3 operator*(double t, const Vec3 &v) {
-        return {t*v.x, t*v.y, t*v.z};
-    }
+	static Vec3 refract(const Vec3 &uv, const Vec3 &n, double etai_over_etat);
 
-    using Point3 = Vec3;
+	static Vec3 randomVec3InUnitDisk();
 
-    class Ray {
-    private:
-        Point3 position;
-        Vec3 direction;
-    public:
-        Ray(Vec3 pos, Vec3 dir);
+	bool verySmall() const;
 
-        Vec3 pos() const;
-        Vec3 dir() const;
 
-        Point3 at(double t) const;
-    };
+};
 
-	class Interval {
-	public:
-		double min, max;
-		Interval();
-		Interval(double min, double max);
+std::ostream &operator<<(std::ostream &out, const Vec3 &other);
 
-		bool within(double x) const;
-
-		bool surround(double x) const;
-
-		static const Interval empty, universe;
-
-	};
-	const static Interval empty(+INF, -INF);
-	const static Interval universe(-INF, +INF);
-
-	inline double randomDouble() {
-		static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-		static std::mt19937 generator;
-		return distribution(generator);
-	}
-
-	inline double randomDouble(double min, double max) {
-		return min + (max - min) * randomDouble();
-	}
-
+inline Vec3 operator*(double t, const Vec3 &v) {
+	return {t*v.x, t*v.y, t*v.z};
 }
+
+using Point3 = Vec3;
+
+class Ray {
+private:
+	Point3 position;
+	Vec3 direction;
+public:
+	Ray(Vec3 pos, Vec3 dir);
+	Ray() = default;
+
+	Vec3 pos() const;
+	Vec3 dir() const;
+
+	Point3 at(double t) const;
+};
+
+class Interval {
+public:
+	double min, max;
+	Interval();
+	Interval(double min, double max);
+
+	bool within(double x) const;
+
+	bool surround(double x) const;
+
+	static const Interval empty, universe;
+
+};
+const static Interval empty(+INF, -INF);
+const static Interval universe(-INF, +INF);
+
+inline double randomDouble() {
+	static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+	static std::mt19937 generator;
+	return distribution(generator);
+}
+
+inline double randomDouble(double min, double max) {
+	return min + (max - min) * randomDouble();
+}
+
 
 #endif //ONEWEEKEND_MATHUTIL_H
