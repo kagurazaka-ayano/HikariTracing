@@ -22,6 +22,13 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(KawaiiMQ)
 list(APPEND INCLUDE_THIRDPARTIES ${KawaiiMQ_SOURCE_DIR}/include)
 link_libraries(KawaiiMQ)
+FetchContent_Declare(
+        metal
+        GIT_REPOSITORY https://github.com/bkaradzic/metal-cpp.git
+        GIT_TAG metal-cpp_macOS14.2_iOS17.2
+)
+FetchContent_MakeAvailable(metal)
+list(APPEND INCLUDE_THIRDPARTIES ${metal_SOURCE_DIR}/SingleHeader)
 
 set(INCLUDE ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES})
 
