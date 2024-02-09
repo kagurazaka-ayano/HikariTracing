@@ -11,7 +11,6 @@
 
 void Camera::Render(const IHittable& world, const std::string& path, const std::string& name) {
 	auto now = std::chrono::system_clock::now();
-	spdlog::info("rendering started!");
 	int worker_cnt;
 	if(render_thread_count == 0) {
 		worker_cnt = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
@@ -19,61 +18,123 @@ void Camera::Render(const IHittable& world, const std::string& path, const std::
 	else {
 		worker_cnt = render_thread_count;
 	}
-	spdlog::info("using {} threads", worker_cnt);
-	auto displacement = getHeight() / worker_cnt;
-	auto workers = std::vector<std::future<std::vector<std::vector<Color>>>>();
-	for (int i = 0; i < worker_cnt - 1; ++i) {
-		auto f = std::async(std::launch::async, &Camera::RenderWorker, this, std::ref(world), i * displacement, (i + 1) * displacement);
-		workers.push_back(std::move(f));
+	std::vector<std::vector<Color>> image;
+	image.resize(height);
+	for(auto& i : image) {
+		i.resize(width);
 	}
-	auto f = std::async(std::launch::async, &Camera::RenderWorker, this, std::ref(world), (worker_cnt - 1) * displacement, getHeight());
-	workers.push_back(std::move(f));
-	auto img = std::vector<std::vector<Color>>();
-	for (auto& i : workers) {
-		auto res = i.get();
-		img.insert(img.end(), res.begin(), res.end());
+	int part = partition();
+	auto m = KawaiiMQ::MessageQueueManager::Instance();
+	auto result_queue = KawaiiMQ::makeQueue("result");
+	auto result_topic = KawaiiMQ::Topic("renderResult");
+	m->relate(result_topic, result_queue);
+	auto th = std::vector<std::thread>();
+	spdlog::info("rendering started!");
+	spdlog::info("using {} threads to render {} blocks", worker_cnt, part);
+	auto begin = std::chrono::system_clock::now();
+	for(int i = 0; i < worker_cnt; i++) {
+		th.emplace_back(&Camera::RenderWorker, this, std::ref(world));
+	}
+	for(auto& i : th) {
+		i.join();
 	}
 	auto end = std::chrono::system_clock::now();
-	auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - now);
-	spdlog::info("finished! rendering time: {}s", static_cast<double>(elapsed.count()) / 1000.0);
-	makePPM(getWidth(), getHeight(), img, path, name);
+	auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+	spdlog::info("render completed! taken {}s", static_cast<double>(time_elapsed.count()) / 1000.0);
+	auto consumer = KawaiiMQ::Consumer("resultConsumer");
+	consumer.subscribe(result_topic);
+	while(!result_queue->empty()) {
+		auto chunk = KawaiiMQ::getMessage<ImageChunk>(consumer.fetchSingleTopic(result_topic)[0]);
+		for(int i = chunk.starty; i < chunk.starty + chunk.height; i++) {
+			for(int j = chunk.startx; j < chunk.startx + chunk.width; j++) {
+				image[i][j] = chunk.partial[i - chunk.starty][j - chunk.startx];
+			}
+		}
+	}
+	makePPM(width, height, image, path, name);
+
 }
 
-
-std::vector<std::vector<Color>> Camera::RenderWorker(const IHittable &world, int start, int end) {
-	auto img = std::vector<std::vector<Color>>();
+void Camera::RenderWorker(const IHittable &world) {
 	std::stringstream ss;
 	ss << std::this_thread::get_id();
-	spdlog::info("thread {} (from {} to {}) started!", ss.str(), start, end - 1);
-	auto range = end - start;
-	auto begin = std::chrono::system_clock::now();
-	for (int i = start; i < end; ++i) {
-		auto v = std::vector<Color>();
-		if (i % (range / 3) == 0) {
-			spdlog::info("line remaining for thread {}: {}", ss.str(), (range - (i - start) + 1));
-		}
-		for (int j = 0; j < getWidth(); ++j) {
-			Color pixel_color = {0, 0, 0};
-			for (int k = 0; k < sample_count; ++k) {
-				auto ray = getRay(j, i);
-				pixel_color += rayColor(ray, world, render_depth);
+	auto m = KawaiiMQ::MessageQueueManager::Instance();
+	auto result_topic = KawaiiMQ::Topic("renderResult");
+	auto result_producer = KawaiiMQ::Producer("producer");
+	result_producer.subscribe(result_topic);
+	auto task_topic = KawaiiMQ::Topic("renderTask");
+	auto task_fetcher = KawaiiMQ::Consumer({task_topic});
+	auto task_queue = m->getAllRelatedQueue(task_topic)[0];
+	int chunk_rendered = 0;
+	spdlog::info("thread {} started", ss.str());
+	while (!task_queue->empty()) {
+		auto chunk = KawaiiMQ::getMessage<ImageChunk>(task_fetcher.fetchSingleTopic(task_topic)[0]);
+		spdlog::info("chunk {} (start from ({}, {}), dimension {} * {}) started by thread {}", chunk.chunk_idx,
+					 chunk.startx, chunk.starty, chunk.width, chunk.height, ss.str());
+		for (int i = chunk.starty; i < chunk.starty + chunk.height; i++) {
+			auto hori = std::vector<Color>();
+			hori.reserve(chunk.width);
+			for (int j = chunk.startx; j < chunk.startx + chunk.width; j++) {
+				Color pixel_color = {0, 0, 0};
+				for (int k = 0; k < sample_count; ++k) {
+					auto ray = getRay(j, i);
+					pixel_color += rayColor(ray, world, render_depth);
+				}
+				pixel_color /= sample_count;
+				pixel_color = {gammaCorrect(pixel_color.x), gammaCorrect(pixel_color.y), gammaCorrect(pixel_color.z)};
+				hori.emplace_back(pixel_color);
 			}
-			pixel_color /= sample_count;
-			pixel_color = {gammaCorrect(pixel_color.x), gammaCorrect(pixel_color.y), gammaCorrect(pixel_color.z)};
-			v.emplace_back(pixel_color);
+			chunk.partial.emplace_back(hori);
 		}
-		img.emplace_back(v);
+		auto message = KawaiiMQ::makeMessage(chunk);
+		result_producer.publishMessage(result_topic, message);
 	}
-	auto finish = std::chrono::system_clock::now();
-	auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(finish - begin);
-	spdlog::info("thread {} (from {} to {}) finished! time: {}s", ss.str(), start, end - 1, static_cast<double>(elapsed.count()) / 1000.0);
-	return img;
+}
+
+int Camera::partition() {
+	auto manager = KawaiiMQ::MessageQueueManager::Instance();
+	auto queue = KawaiiMQ::makeQueue("renderTaskQueue");
+	auto topic = KawaiiMQ::Topic("renderTask");
+	manager->relate(topic, queue);
+	KawaiiMQ::Producer prod("chunkPusher");
+	prod.subscribe(topic);
+	int upperleft_x = 0;
+	int upperleft_y = 0;
+	int idx = 0;
+	while(upperleft_y < height) {
+		while(upperleft_x < width) {
+			ImageChunk chunk;
+			chunk.chunk_idx = idx;
+			++idx;
+			chunk.startx = upperleft_x;
+			chunk.starty = upperleft_y;
+			if(upperleft_x + chunk_dimension > width) {
+				chunk.width = width % chunk_dimension;
+			}
+			else {
+				chunk.width = chunk_dimension;
+			}
+			if(upperleft_y + chunk_dimension > height) {
+				chunk.height = height % chunk_dimension;
+			}
+			else {
+				chunk.height = chunk_dimension;
+			}
+			auto message = KawaiiMQ::makeMessage(chunk);
+			prod.broadcastMessage(message);
+			upperleft_x += chunk_dimension;
+		}
+		upperleft_x = 0;
+		upperleft_y += chunk_dimension;
+	}
+	return idx;
 }
 
 Camera::Camera(int width, double aspect_ratio, double fov, Vec3 target, Point3 position, double dof_angle) : width(width), aspect_ratio(aspect_ratio),
 	fov(fov), target(std::move(target)),
 	position(std::move(position)),
 	height(static_cast<int>(width / aspect_ratio)), dof_angle(dof_angle){
+	render_thread_count = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
 	updateVectors();
 
 }
@@ -153,6 +214,9 @@ const Point3 &Camera::getPixel00() const {
 void Camera::setWidth(int width) {
 	Camera::width = width;
 	height = static_cast<int>(width / aspect_ratio);
+	if (render_thread_count > width || render_thread_count > height) {
+		render_thread_count = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
+	}
 	updateVectors();
 }
 
@@ -213,7 +277,12 @@ int Camera::getRenderThreadCount() const {
 	return render_thread_count;
 }
 void Camera::setRenderThreadCount(int renderThreadCount) {
-	render_thread_count = renderThreadCount;
+	if (renderThreadCount == 0 || renderThreadCount > width || renderThreadCount > height) {
+		render_thread_count = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
+	}
+	else {
+		render_thread_count = renderThreadCount;
+	}
 }
 void Camera::setFov(double fov) {
 	this->fov = fov;
@@ -239,10 +308,18 @@ void Camera::setFocalLen(double focalLen) {
 	focal_len = focalLen;
 	updateVectors();
 }
+
 Ray Camera::getRay(int x, int y) {
 	auto pixel_vec = pixel_00 + pix_delta_x * x + pix_delta_y * y + randomDisplacement();
 	auto origin = dof_angle <= 0 ? position : dofDiskSample();
 	auto direction = pixel_vec - origin;
 	return Ray(origin, direction);
 
+}
+int Camera::getChunkDimension() const {
+	return chunk_dimension;
+}
+
+void Camera::setChunkDimension(int dimension) {
+	chunk_dimension = (dimension > width || dimension > height) ? width / render_thread_count : dimension;
 }

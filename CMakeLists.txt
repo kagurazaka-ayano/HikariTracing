@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.27)
-project(OneWeekend)
+project(Raytracing)
 include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 23)
 
 file(GLOB SRC "./src/*.cpp")
-set(INCLUDE_SELF "./include/OneWeekend/")
+set(INCLUDE_SELF "./include/Raytracing/")
 
 FetchContent_Declare(
         spdlog
@@ -16,10 +16,12 @@ FetchContent_MakeAvailable(spdlog)
 list(APPEND INCLUDE_THIRDPARTIES ${spdlog_SOURCE_DIR}/include)
 FetchContent_Declare(
         KawaiiMQ
-        URL https://github.com/kagurazaka-ayano/KawaiiMq/releases/latest/download/KawaiiMQ-src.zip
+        GIT_REPOSITORY https://github.com/kagurazaka-ayano/KawaiiMq.git
+        GIT_TAG main
 )
 FetchContent_MakeAvailable(KawaiiMQ)
 list(APPEND INCLUDE_THIRDPARTIES ${KawaiiMQ_SOURCE_DIR}/include)
+link_libraries(KawaiiMQ)
 
 set(INCLUDE ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES})
 

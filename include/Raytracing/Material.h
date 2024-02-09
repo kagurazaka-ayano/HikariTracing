@@ -9,6 +9,7 @@
 #define ONEWEEKEND_MATERIAL_H
 #include "MathUtil.h"
 #include "GraphicObjects.h"
+#include "KawaiiMQ/kawaiiMQ.h"
 
 class IMaterial {
 public:

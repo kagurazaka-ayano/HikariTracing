@@ -8,8 +8,12 @@
 #ifndef ONEWEEKEND_CAMERA_H
 #define ONEWEEKEND_CAMERA_H
 
-#include "MathUtil.h"
 #include "GraphicObjects.h"
+#include "ImageUtil.h"
+#include "KawaiiMQ/Topic.h"
+#include "MathUtil.h"
+#include <future>
+#include <thread>
 
 class Camera {
 public:
@@ -77,9 +81,14 @@ public:
 
 	void setFocalLen(double focalLen);
 
+	int getChunkDimension() const;
+
+	void setChunkDimension(int dimension);
+
+	int partition();
 private:
 
-	std::vector<std::vector<Color>> RenderWorker(const IHittable &world, int start, int end);
+	void RenderWorker(const IHittable &world);
 
 	Color rayColor(const Ray &ray, const IHittable &object, int depth);
 
@@ -98,8 +107,9 @@ private:
 	double fov = 45;
 	int sample_count = 20;
 	int render_depth = 50;
-	int render_thread_count = 0;
+	int render_thread_count = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
 	double dof_angle = 0;
+	int chunk_dimension;
 	Vec3 u, v, w;
 	Point3 position;
 	Point3 target;

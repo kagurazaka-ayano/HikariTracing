@@ -2,8 +2,10 @@
 #include "GraphicObjects.h"
 #include "Material.h"
 #include "Camera.h"
+#include "KawaiiMQ/kawaiiMQ.h"
 
 int main() {
+
 	auto camera = Camera(1920, 16.0 / 9.0, 30, {0, 0, 0}, {-13, 2, 3}, 0.6);
 	auto world = HittableList();
 	auto ground_material = std::make_shared<Metal>(Metal(Color(0.69, 0.72, 0.85), 0.4));
@@ -14,7 +16,7 @@ int main() {
 	world.add(std::make_shared<Sphere>(Sphere(1, {0, 1, 0}, center_ball_material)));
 	world.add(std::make_shared<Sphere>(Sphere(1, {4, 1, 0}, right_ball_material)));
 	world.add(std::make_shared<Sphere>(Sphere(1, {-4, 1, 0}, left_ball_material)));
-	camera.setSampleCount(100);
+	camera.setSampleCount(200);
 	for(int i = -15; i < 15; i++) {
 		for (int j = -15; j < 11; ++j) {
 			auto coord = Vec3((i + randomDouble(-1, 1)), 0.2, (j + randomDouble(-1, 1)));
@@ -46,6 +48,7 @@ int main() {
 	}
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
+	camera.setChunkDimension(64);
 	camera.Render(world, "out", "test.ppm");
 	return 0;
 }

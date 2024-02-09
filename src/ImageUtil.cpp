@@ -33,3 +33,4 @@ void makePPM(int width, int height, std::vector<std::vector<Color>> img, const s
 	fout.close();
 	system(std::string("open " + dir + name).c_str());
 }
+
