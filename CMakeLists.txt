@@ -33,7 +33,6 @@ set(INCLUDE_NORMAL ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES})
 add_executable(RaytracingNormal ${SRC_NORMAL})
 add_executable(RaytracingNormalASCII ${SRC_NORMAL})
 target_compile_definitions(RaytracingNormalASCII PRIVATE "ASCII_ART")
-add_executable(RaytracingMetal ${SRC_METAL})
 
 target_include_directories(RaytracingNormal PUBLIC ${INCLUDE_NORMAL})
 target_include_directories(RaytracingNormalASCII PUBLIC ${INCLUDE_NORMAL})
