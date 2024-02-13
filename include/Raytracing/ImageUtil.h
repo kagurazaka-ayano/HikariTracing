@@ -18,11 +18,22 @@
 #include "KawaiiMQ/kawaiiMQ.h"
 using Color = Vec3;
 
-double gammaCorrect(double c);
+const std::string grayscale = " .:-=+*#%@";
 
-void makePPM(int width, int height, std::vector<std::vector<Color>> img, const std::string &path,
+std::string getGreyScaleCharacter(double r, double g, double b);
+
+void makePPM(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &path,
 			 const std::string &name);
 
+void makeGrayscaleTxt(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &path, const std::string &name);
+
+std::string makeGrayscaleString(int width, int height, std::vector<std::vector<Color>> img);
+
+void mkdir(const std::string& path, const std::string& name);
+
+std::vector<std::string> split(const std::string& str, const std::string& delimeter);
+
+double gammaCorrect(double c);
 
 struct ImageChunk : public KawaiiMQ::MessageData {
 	int startx;
@@ -32,5 +43,7 @@ struct ImageChunk : public KawaiiMQ::MessageData {
 	int height;
 	std::vector<std::vector<Color>> partial;
 };
+
+
 
 #endif //ONEWEEKEND_IMAGEUTIL_H

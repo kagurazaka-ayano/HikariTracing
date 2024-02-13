@@ -51,8 +51,11 @@ void Camera::Render(const IHittable& world, const std::string& path, const std::
 			}
 		}
 	}
+#ifndef ASCII_ART
 	makePPM(width, height, image, path, name);
-
+#else
+	makeGrayscaleTxt(width, height, image, path, name);
+#endif
 }
 
 void Camera::RenderWorker(const IHittable &world) {
@@ -65,12 +68,17 @@ void Camera::RenderWorker(const IHittable &world) {
 	auto task_topic = KawaiiMQ::Topic("renderTask");
 	auto task_fetcher = KawaiiMQ::Consumer({task_topic});
 	auto task_queue = m->getAllRelatedQueue(task_topic)[0];
-	int chunk_rendered = 0;
 	spdlog::info("thread {} started", ss.str());
 	while (!task_queue->empty()) {
-		auto chunk = KawaiiMQ::getMessage<ImageChunk>(task_fetcher.fetchSingleTopic(task_topic)[0]);
-		spdlog::info("chunk {} (start from ({}, {}), dimension {} * {}) started by thread {}", chunk.chunk_idx,
-					 chunk.startx, chunk.starty, chunk.width, chunk.height, ss.str());
+		ImageChunk chunk;
+		try {
+			chunk = KawaiiMQ::getMessage<ImageChunk>(task_fetcher.fetchSingleTopic(task_topic)[0]);
+		}
+		catch (KawaiiMQ::QueueException& e) {
+			break;
+		}
+//		spdlog::info("chunk {} (start from ({}, {}), dimension {} * {}) started by thread {}", chunk.chunk_idx,
+//					 chunk.startx, chunk.starty, chunk.width, chunk.height, ss.str());
 		for (int i = chunk.starty; i < chunk.starty + chunk.height; i++) {
 			auto hori = std::vector<Color>();
 			hori.reserve(chunk.width);
@@ -87,11 +95,11 @@ void Camera::RenderWorker(const IHittable &world) {
 			chunk.partial.emplace_back(hori);
 		}
 		auto message = KawaiiMQ::makeMessage(chunk);
-		result_producer.publishMessage(result_topic, message);
+		result_producer.broadcastMessage(message);
 	}
 }
 
-int Camera::partition() {
+int Camera::partition() const {
 	auto manager = KawaiiMQ::MessageQueueManager::Instance();
 	auto queue = KawaiiMQ::makeQueue("renderTaskQueue");
 	auto topic = KawaiiMQ::Topic("renderTask");
@@ -244,7 +252,7 @@ Color Camera::rayColor(const Ray &ray, const IHittable &object, int depth) {
 	HitRecord record;
 	if(depth <= 0) return {0, 0, 0};
 
-	if (object.hit(ray, Interval(0.01, INF), record)) {
+	if (object.hit(ray, Interval(EPS, INF), record)) {
 		Ray scattered;
 		Color attenuation;
 
@@ -313,8 +321,8 @@ Ray Camera::getRay(int x, int y) {
 	auto pixel_vec = pixel_00 + pix_delta_x * x + pix_delta_y * y + randomDisplacement();
 	auto origin = dof_angle <= 0 ? position : dofDiskSample();
 	auto direction = pixel_vec - origin;
-	return Ray(origin, direction);
-
+	auto time = randomDouble(0, shutter_speed);
+	return Ray(origin, direction, time);
 }
 int Camera::getChunkDimension() const {
 	return chunk_dimension;
@@ -322,4 +330,12 @@ int Camera::getChunkDimension() const {
 
 void Camera::setChunkDimension(int dimension) {
 	chunk_dimension = (dimension > width || dimension > height) ? width / render_thread_count : dimension;
+}
+
+double Camera::getShutterSpeed() const {
+	return shutter_speed;
+}
+
+void Camera::setShutterSpeed(double shutterSpeed) {
+	shutter_speed = shutterSpeed;
 }

@@ -43,3 +43,4 @@ build
 # apple
 .DS_Store
 
+cmake

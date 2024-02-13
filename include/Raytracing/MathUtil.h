@@ -98,12 +98,15 @@ class Ray {
 private:
 	Point3 position;
 	Vec3 direction;
+	double tm;
 public:
+	Ray(Vec3 pos, Vec3 dir, double time);
 	Ray(Vec3 pos, Vec3 dir);
 	Ray() = default;
 
 	Vec3 pos() const;
 	Vec3 dir() const;
+	double time() const;
 
 	Point3 at(double t) const;
 };
@@ -112,7 +115,10 @@ class Interval {
 public:
 	double min, max;
 	Interval();
+
 	Interval(double min, double max);
+
+	Interval(const Interval& first, const Interval& second);
 
 	bool within(double x) const;
 
@@ -124,6 +130,24 @@ public:
 const static Interval empty(+INF, -INF);
 const static Interval universe(-INF, +INF);
 
+class AABB {
+public:
+	Interval x, y, z;
+
+	AABB() = default;
+
+	AABB(const Point3 &a, const Point3 &b);
+
+	AABB(const Interval& x, const Interval& y, const Interval& z);
+
+	AABB(const AABB& up, const AABB& down);
+
+	Interval axis(int i) const;
+
+	[[nodiscard]] bool hit(const Ray &r, Interval ray_int) const;
+
+};
+
 inline double randomDouble() {
 	static std::uniform_real_distribution<double> distribution(0.0, 1.0);
 	static std::mt19937 generator;
@@ -132,6 +156,10 @@ inline double randomDouble() {
 
 inline double randomDouble(double min, double max) {
 	return min + (max - min) * randomDouble();
+}
+
+inline int randomInt(int min, int max) {
+	return static_cast<int>(randomDouble(min, max + 1));
 }
 
 

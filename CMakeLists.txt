@@ -31,6 +31,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(metal)
 set(METAL ${metal_SOURCE_DIR})
+list(APPEND METAL include/metal)
 
 
 set(INCLUDE_NORMAL ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES})
@@ -38,9 +39,12 @@ set(INCLUDE_METAL ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES} ${METAL})
 
 
 add_executable(RaytracingNormal ${SRC_NORMAL})
+add_executable(RaytracingNormalASCII ${SRC_NORMAL})
+target_compile_definitions(RaytracingNormalASCII PRIVATE "ASCII_ART")
 add_executable(RaytracingMetal ${SRC_METAL})
 
 target_include_directories(RaytracingNormal PUBLIC ${INCLUDE_NORMAL})
+target_include_directories(RaytracingNormalASCII PUBLIC ${INCLUDE_NORMAL})
 target_include_directories(RaytracingMetal PUBLIC ${INCLUDE_METAL})
 target_link_libraries(RaytracingMetal
         "-framework Metal"

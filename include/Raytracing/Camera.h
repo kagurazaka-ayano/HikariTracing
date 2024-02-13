@@ -85,10 +85,11 @@ public:
 
 	void setChunkDimension(int dimension);
 
-	int partition();
-private:
+	double getShutterSpeed() const;
 
-	void RenderWorker(const IHittable &world);
+	void setShutterSpeed(double shutterSpeed);
+
+private:
 
 	Color rayColor(const Ray &ray, const IHittable &object, int depth);
 
@@ -98,6 +99,10 @@ private:
 
 	Point3 dofDiskSample() const;
 
+	void RenderWorker(const IHittable &world);
+
+	int partition() const;
+	
 	int width;
 	int height;
 	double aspect_ratio;
@@ -108,8 +113,9 @@ private:
 	int sample_count = 20;
 	int render_depth = 50;
 	int render_thread_count = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
-	double dof_angle = 0;
 	int chunk_dimension;
+	double dof_angle = 0;
+	double shutter_speed = 1;
 	Vec3 u, v, w;
 	Point3 position;
 	Point3 target;

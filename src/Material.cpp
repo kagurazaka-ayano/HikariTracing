@@ -7,8 +7,10 @@
 
 #include "Material.h"
 
+#include <utility>
 
-Lambertian::Lambertian(const Color &albedo) : albedo(albedo) {
+
+Lambertian::Lambertian(Color albedo) : albedo(std::move(albedo)) {
 
 }
 bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, Vec3 &attenuation,
@@ -17,7 +19,7 @@ bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, Vec3 &attenua
 	if (ray_dir.verySmall()) {
 		ray_dir = record.normal;
 	}
-	scattered = Ray(record.p, ray_dir);
+	scattered = Ray(record.p, ray_dir, r_in.time());
 	attenuation = albedo;
 	return true;
 }
@@ -26,7 +28,7 @@ Metal::Metal(const Color &albedo, double fuzz) : albedo(albedo), fuzz(fuzz) {}
 bool Metal::scatter(const Ray &r_in, const HitRecord &record, Vec3 &attenuation,
 					Ray &scattered) const {
 	auto ray_dir = Vec3::reflect(r_in.dir().unit() + Vec3::randomUnitVec3() * fuzz, record.normal);
-	scattered = Ray(record.p, ray_dir);
+	scattered = Ray(record.p, ray_dir, r_in.time());
 	attenuation = albedo;
 	return true;
 }
@@ -49,7 +51,7 @@ bool Dielectric::scatter(const Ray &r_in, const HitRecord &record, Vec3 &attenua
 	else
 		dir = Vec3::reflect(r_in.dir().unit(), record.normal);
 
-	scattered = Ray(record.p, dir);
+	scattered = Ray(record.p, dir, r_in.time());
 	return true;
 }
 double Dielectric::reflectance(double cosine, double refr_idx) {

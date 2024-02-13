@@ -179,7 +179,12 @@ std::ostream& operator<<(std::ostream &out, const Vec3 &other) {
 	return out;
 }
 
-Ray::Ray(Vec3 pos, Vec3 dir) : position(std::move(pos)), direction(std::move(dir)) {
+Ray::Ray(Vec3 pos, Vec3 dir): position(std::move(pos)), direction(std::move(dir)), tm(0)
+{
+	
+}
+
+Ray::Ray(Vec3 pos, Vec3 dir, double time) : position(std::move(pos)), direction(std::move(dir)), tm(time) {
 
 }
 
@@ -189,6 +194,11 @@ Point3 Ray::at(double t) const {
 
 Vec3 Ray::dir() const {
 	return direction;
+}
+
+double Ray::time() const
+{
+	return tm;
 }
 
 Vec3 Ray::pos() const {
@@ -205,4 +215,53 @@ bool Interval::within(double x) const {
 }
 bool Interval::surround(double x) const {
 	return (min < x) && (x < max);
+}
+Interval::Interval(const Interval &first, const Interval &second) {
+	min = fmin(first.min, second.min);
+	max = fmax(first.max, second.max);
+}
+
+AABB::AABB(const Point3 &a, const Point3 &b) {
+	x = Interval(fmin(a.x, b.x), fmax(a.x, b.x));
+	y = Interval(fmin(a.y, b.y), fmax(a.y, b.y));
+	z = Interval(fmin(a.z, b.z), fmax(a.z, b.z));
+}
+
+AABB::AABB(const Interval &x, const Interval &y, const Interval &z) : x(x), y(y), z(z) {
+
+}
+
+Interval AABB::axis(int i) const {
+	switch (i) {
+		case 0:
+			return x;
+		case 1:
+			return y;
+		case 2:
+			return z;
+	}
+}
+
+bool AABB::hit(const Ray &r, Interval ray_int) const {
+	for (int i = 0; i < 3; i++) {
+		auto invD = 1.0 / r.dir()[i];
+		auto orig = r.pos()[i];
+
+		auto t0 = (axis(i).min - orig) * invD;
+		auto t1 = (axis(i).max - orig) * invD;
+
+		if (invD < 0.0) {
+			std::swap(t0, t1);
+		}
+
+		if (ray_int.max < ray_int.min) {
+			return false;
+		}
+	}
+	return true;
+}
+AABB::AABB(const AABB &up, const AABB &down) {
+	x = Interval(up.x, down.x);
+	y = Interval(up.y, down.y);
+	z = Interval(up.z, down.z);
 }
