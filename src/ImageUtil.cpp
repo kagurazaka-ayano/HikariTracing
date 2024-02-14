@@ -26,7 +26,7 @@ void makePPM(int width, int height, const std::vector<std::vector<Color>>& img, 
 	fout << "P3\n" << width << ' ' << height << "\n255\n";
 	for(int i = 0; i < height; i++) {
 		for(int j = 0; j < width; j++) {
-			fout << img[i][j].makeColor();
+			fout << makeColor(img[i][j]);
 		}
 	}
 	fout.close();
@@ -36,7 +36,7 @@ std::string makeGrayscaleString(int width, int height, std::vector<std::vector<C
 	std::stringstream ss;
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j) {
-			ss << getGreyScaleCharacter(img[i][j].x, img[i][j].y, img[i][j].z);
+			ss << getGreyScaleCharacter(img[i][j][0], img[i][j][1], img[i][j][2]);
 		}
 		ss << std::endl;
 	}

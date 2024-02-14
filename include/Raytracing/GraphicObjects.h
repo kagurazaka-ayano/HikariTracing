@@ -22,10 +22,10 @@ struct HitRecord {
 	bool hit;
 	Point3 p;
 	double t;
-	Vec3 normal;
+	Math::Vector3 normal;
 	std::shared_ptr<IMaterial> material;
 	bool front_face;
-	void setFaceNormal(const Ray& r, const Vec3& normal_out);
+	void setFaceNormal(const Ray& r, const Math::Vector3& normal_out);
 };
 
 class IHittable {
@@ -64,22 +64,22 @@ private:
 
 class Sphere : public IHittable {
 public:
-	Sphere(double radius, Vec3 position, std::shared_ptr<IMaterial> mat);
+	Sphere(double radius, Math::Vector3 position, std::shared_ptr<IMaterial> mat);
 
 	Sphere(double radius, const Point3& init_position, const Point3& final_position, std::shared_ptr<IMaterial> mat);
 
-	Vec3 getPosition(double time) const;
+	Math::Vector3 getPosition(double time) const;
 	
 	bool hit(const Ray &r, Interval interval, HitRecord& record) const override;
 
 	AABB boundingBox() const override;
 
 private:
-	Vec3 direction_vec;
+	Math::Vector3 direction_vec;
 	bool is_moving = false;
 	double radius;
 	AABB bbox;
-	Vec3 position;
+	Math::Vector3 position;
 	std::shared_ptr<IMaterial> material;
 };
 

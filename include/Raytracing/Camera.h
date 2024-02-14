@@ -17,7 +17,7 @@
 
 class Camera {
 public:
-	Camera(int width, double aspect_ratio, double fov, Vec3 target, Point3 position, double dof_angle);
+	Camera(int width, double aspect_ratio, double fov, Math::Vector3 target, Point3 position, double dof_angle);
 
 	int getWidth() const;
 
@@ -37,13 +37,13 @@ public:
 
 	const Point3 &getPosition() const;
 
-	const Vec3 &getHoriVec() const;
+	const Math::Vector3 &getHoriVec() const;
 
-	const Vec3 &getVertVec() const;
+	const Math::Vector3 &getVertVec() const;
 
-	const Vec3 &getPixDeltaX() const;
+	const Math::Vector3 &getPixDeltaX() const;
 
-	const Vec3 &getPixDeltaY() const;
+	const Math::Vector3 &getPixDeltaY() const;
 
 	const Point3 &getViewportUl() const;
 
@@ -95,7 +95,7 @@ private:
 
 	void updateVectors();
 
-	Vec3 randomDisplacement() const;
+	Math::Vector3 randomDisplacement() const;
 
 	Point3 dofDiskSample() const;
 
@@ -116,18 +116,18 @@ private:
 	int chunk_dimension;
 	double dof_angle = 0;
 	double shutter_speed = 1;
-	Vec3 u, v, w;
+	Math::Vector3 u, v, w;
 	Point3 position;
 	Point3 target;
-	Vec3 UP = {0, 1, 0};
-	Vec3 hori_vec;
-	Vec3 vert_vec;
-	Vec3 pix_delta_x;
-	Vec3 pix_delta_y;
+	Math::Vector3 UP = {0, 1, 0};
+	Math::Vector3 hori_vec;
+	Math::Vector3 vert_vec;
+	Math::Vector3 pix_delta_x;
+	Math::Vector3 pix_delta_y;
 	Point3 viewport_ul;
 	Point3 pixel_00;
-	Vec3 dof_disk_h;
-	Vec3 dof_disk_v;
+	Math::Vector3 dof_disk_h;
+	Math::Vector3 dof_disk_v;
 };
 
 #endif // ONEWEEKEND_CAMERA_H

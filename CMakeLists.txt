@@ -34,13 +34,21 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(metal)
 set(METAL ${metal_SOURCE_DIR}/SingleHeader)
 list(APPEND METAL "include/metal")
+FetchContent_Declare(
+        Math
+        GIT_REPOSITORY https://github.com/kagurazaka-ayano/AppleMath.git
+        GIT_TAG main
+)
+FetchContent_MakeAvailable(Math)
+list(APPEND INCLUDE_SELF ${Math_SOURCE_DIR}/include)
+link_libraries(Math)
 
 set(INCLUDE_NORMAL ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES})
 set(INCLUDE_METAL ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES} ${METAL})
 
 
 add_executable(RaytracingNormal ${SRC_NORMAL})
-add_executable(RaytracingMetal ${SRC_METAL})
+add_executable(RaytracingMetal ${SRC_METAL} ${SRC_NORMAL_NO_MAIN})
 
 target_include_directories(RaytracingNormal PUBLIC ${INCLUDE_NORMAL})
 target_include_directories(RaytracingMetal PUBLIC ${INCLUDE_METAL})
@@ -64,9 +72,3 @@ set_target_properties(
         RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin/normal/release"
 )
 
-set_target_properties(
-        RaytracingNormalASCII
-        PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin/ascii/debug"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin/ascii/release"
-)

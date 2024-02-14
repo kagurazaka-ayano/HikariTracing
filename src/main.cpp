@@ -21,25 +21,23 @@ int main() {
 	for(int i = -15; i < 15; i += 2) {
 		for (int j = -15; j < 15; j += 2) {
 			obj++;
-			auto coord = Vec3((i + randomDouble(-1, 1)), 0.2,(j + randomDouble(-1, 1)));
-			auto displacement = Vec3{0, randomDouble(0, 0), 0};
+			auto coord = Math::Vector3((i + randomDouble(-1, 1)), 0.2,(j + randomDouble(-1, 1)));
+			auto displacement = Math::Vector3{0, randomDouble(0, 0), 0};
 			auto material = static_cast<int>(3.0 * randomDouble());
-			if ((coord - Vec3{0, 1, 0}).length() > 0.9) {
-				Vec3 color;
+			if ((coord - Math::Vector3{0, 1, 0}).length() > 0.9) {
+				Math::Vector3 color = randomVec3().componentProd(randomVec3());
 				std::shared_ptr<IMaterial> sphere_mat;
 				switch (material) {
 					case 0:
-						color = Vec3::random() * Vec3::random();
 						sphere_mat = std::make_shared<Lambertian>(color);
 						world.add(std::make_shared<Sphere>(0.2, coord, coord + displacement, sphere_mat));
 						break;
 					case 1:
-						color = Vec3::random() * Vec3::random();
 						sphere_mat = std::make_shared<Metal>(color, randomDouble(0.2, 0.5));
 						world.add(std::make_shared<Sphere>(0.2, coord, coord + displacement, sphere_mat));
 						break;
 					case 2:
-						color = Vec3::random(0.7, 1);
+						color = randomVec3(0.7, 1);
 						sphere_mat = std::make_shared<Dielectric>(randomDouble(1, 2), color);
 						world.add(std::make_shared<Sphere>(0.2, coord, coord + displacement, sphere_mat));
 						break;
