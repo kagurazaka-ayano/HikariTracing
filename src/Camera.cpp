@@ -70,15 +70,9 @@ void Camera::RenderWorker(const IHittable &world) {
 	auto task_queue = m->getAllRelatedQueue(task_topic)[0];
 	spdlog::info("thread {} started", ss.str());
 	while (!task_queue->empty()) {
-		ImageChunk chunk;
-		try {
-			chunk = KawaiiMQ::getMessage<ImageChunk>(task_fetcher.fetchSingleTopic(task_topic)[0]);
-		}
-		catch (KawaiiMQ::QueueException& e) {
-			break;
-		}
-//		spdlog::info("chunk {} (start from ({}, {}), dimension {} * {}) started by thread {}", chunk.chunk_idx,
-//					 chunk.startx, chunk.starty, chunk.width, chunk.height, ss.str());
+		auto chunk = KawaiiMQ::getMessage<ImageChunk>(task_fetcher.fetchSingleTopic(task_topic)[0]);
+		spdlog::info("chunk {} (start from ({}, {}), dimension {} * {}) started by thread {}", chunk.chunk_idx,
+					 chunk.startx, chunk.starty, chunk.width, chunk.height, ss.str());
 		for (int i = chunk.starty; i < chunk.starty + chunk.height; i++) {
 			auto hori = std::vector<Color>();
 			hori.reserve(chunk.width);
