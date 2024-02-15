@@ -13,7 +13,7 @@
 Lambertian::Lambertian(Color albedo) : albedo(std::move(albedo)) {
 
 }
-bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, Math::Vector3 &attenuation,
+bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
 						 Ray &scattered) const {
 	auto ray_dir = record.normal + randomUnitVec3();
 	if (verySmall(ray_dir)) {
@@ -25,7 +25,7 @@ bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, Math::Vector3
 }
 
 Metal::Metal(const Color &albedo, double fuzz) : albedo(albedo), fuzz(fuzz) {}
-bool Metal::scatter(const Ray &r_in, const HitRecord &record, Math::Vector3 &attenuation,
+bool Metal::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
 					Ray &scattered) const {
 	auto ray_dir = reflect(r_in.dir().normalized() + randomUnitVec3() * fuzz, record.normal);
 	scattered = Ray(record.p, ray_dir, r_in.time());
@@ -35,7 +35,7 @@ bool Metal::scatter(const Ray &r_in, const HitRecord &record, Math::Vector3 &att
 
 Dielectric::Dielectric(double idx, const Color &albedo): ir(idx), albedo(albedo) {}
 
-bool Dielectric::scatter(const Ray &r_in, const HitRecord &record, Math::Vector3 &attenuation,
+bool Dielectric::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
 						 Ray &scattered) const {
 	attenuation = albedo;
 	double ref_ratio = record.front_face ? (1.0 / ir) : ir;
@@ -45,7 +45,7 @@ bool Dielectric::scatter(const Ray &r_in, const HitRecord &record, Math::Vector3
 	double sin = sqrt(1 - cos * cos);
 
 	bool can_refr = ref_ratio * sin < 1.0;
-	Math::Vector3 dir;
+	AppleMath::Vector3 dir;
 	if(can_refr && reflectance(cos, ref_ratio) < randomDouble())
 		dir = refract(r_in.dir().normalized(), record.normal, ref_ratio);
 	else

@@ -10,14 +10,14 @@
 #include "Material.h"
 
 
-Sphere::Sphere(double radius, Math::Vector3 position, std::shared_ptr<IMaterial> mat) : radius(radius), position(std::move(position)), material(std::move(mat)) {
-	auto rvec = Math::Vector3{radius, radius, radius};
+Sphere::Sphere(double radius, AppleMath::Vector3 position, std::shared_ptr<IMaterial> mat) : radius(radius), position(std::move(position)), material(std::move(mat)) {
+	auto rvec = AppleMath::Vector3{radius, radius, radius};
 	bbox = AABB(this->position - rvec, this->position + rvec);
 }
 
 bool Sphere::hit(const Ray &r, Interval interval, HitRecord& record) const {
 	auto sphere_center = getPosition(r.time());
-    std::shared_ptr<Math::Vector3> oc = std::make_shared<Math::Vector3>(r.pos() - sphere_center);
+    std::shared_ptr<AppleMath::Vector3> oc = std::make_shared<AppleMath::Vector3>(r.pos() - sphere_center);
     auto a = r.dir().lengthSq();
     auto h = oc->dot(r.dir());
     auto c = oc->lengthSq() - radius * radius;
@@ -41,7 +41,7 @@ bool Sphere::hit(const Ray &r, Interval interval, HitRecord& record) const {
     return true;
 }
 
-void HitRecord::setFaceNormal(const Ray &r, const Math::Vector3 &normal_out) {
+void HitRecord::setFaceNormal(const Ray &r, const AppleMath::Vector3 &normal_out) {
     front_face = normal_out.dot(r.dir()) < 0;
     normal = front_face ? normal_out : -normal_out;
 }
@@ -92,13 +92,13 @@ Sphere::Sphere(double radius, const Point3& init_position, const Point3& final_p
     radius(radius), position(init_position), material(std::move(mat)) {
     direction_vec = final_position - init_position;
     is_moving = true;
-	auto rvec = Math::Vector3{radius, radius, radius};
+	auto rvec = AppleMath::Vector3{radius, radius, radius};
 	auto bbox1 = AABB(init_position - rvec, init_position + rvec);
 	auto bbox2 = AABB(final_position - rvec, final_position + rvec);
 	bbox = AABB(bbox1, bbox2);
 }
 
-Math::Vector3 Sphere::getPosition(double time) const
+AppleMath::Vector3 Sphere::getPosition(double time) const
 {
     return is_moving ? position + time * direction_vec : position;
 }

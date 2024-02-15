@@ -22,10 +22,10 @@ struct HitRecord {
 	bool hit;
 	Point3 p;
 	double t;
-	Math::Vector3 normal;
+	AppleMath::Vector3 normal;
 	std::shared_ptr<IMaterial> material;
 	bool front_face;
-	void setFaceNormal(const Ray& r, const Math::Vector3& normal_out);
+	void setFaceNormal(const Ray& r, const AppleMath::Vector3& normal_out);
 };
 
 class IHittable {
@@ -64,22 +64,22 @@ private:
 
 class Sphere : public IHittable {
 public:
-	Sphere(double radius, Math::Vector3 position, std::shared_ptr<IMaterial> mat);
+	Sphere(double radius, AppleMath::Vector3 position, std::shared_ptr<IMaterial> mat);
 
 	Sphere(double radius, const Point3& init_position, const Point3& final_position, std::shared_ptr<IMaterial> mat);
 
-	Math::Vector3 getPosition(double time) const;
+	AppleMath::Vector3 getPosition(double time) const;
 	
 	bool hit(const Ray &r, Interval interval, HitRecord& record) const override;
 
 	AABB boundingBox() const override;
 
 private:
-	Math::Vector3 direction_vec;
+	AppleMath::Vector3 direction_vec;
 	bool is_moving = false;
 	double radius;
 	AABB bbox;
-	Math::Vector3 position;
+	AppleMath::Vector3 position;
 	std::shared_ptr<IMaterial> material;
 };
 

@@ -77,13 +77,13 @@ void Camera::RenderWorker(const IHittable &world) {
 			auto hori = std::vector<Color>();
 			hori.reserve(chunk.width);
 			for (int j = chunk.startx; j < chunk.startx + chunk.width; j++) {
-				Color pixel_color = {0, 0, 0};
+				Color pixel_color = Color{0, 0, 0};
 				for (int k = 0; k < sample_count; ++k) {
 					auto ray = getRay(j, i);
 					pixel_color += rayColor(ray, world, render_depth);
 				}
 				pixel_color /= sample_count;
-				pixel_color = {gammaCorrect(pixel_color[0]), gammaCorrect(pixel_color[1]), gammaCorrect(pixel_color[2])};
+				pixel_color = Color{gammaCorrect(pixel_color[0]), gammaCorrect(pixel_color[1]), gammaCorrect(pixel_color[2])};
 				hori.emplace_back(pixel_color);
 			}
 			chunk.partial.emplace_back(hori);
@@ -132,7 +132,7 @@ int Camera::partition() const {
 	return idx;
 }
 
-Camera::Camera(int width, double aspect_ratio, double fov, Math::Vector3 target, Point3 position, double dof_angle) : width(width), aspect_ratio(aspect_ratio),
+Camera::Camera(int width, double aspect_ratio, double fov, AppleMath::Vector3 target, Point3 position, double dof_angle) : width(width), aspect_ratio(aspect_ratio),
 	fov(fov), target(std::move(target)),
 	position(std::move(position)),
 	height(static_cast<int>(width / aspect_ratio)), dof_angle(dof_angle){
@@ -189,19 +189,19 @@ const Point3 &Camera::getPosition() const {
 	return position;
 }
 
-const Math::Vector3 &Camera::getHoriVec() const {
+const AppleMath::Vector3 &Camera::getHoriVec() const {
 	return hori_vec;
 }
 
-const Math::Vector3 &Camera::getVertVec() const {
+const AppleMath::Vector3 &Camera::getVertVec() const {
 	return vert_vec;
 }
 
-const Math::Vector3 &Camera::getPixDeltaX() const {
+const AppleMath::Vector3 &Camera::getPixDeltaX() const {
 	return pix_delta_x;
 }
 
-const Math::Vector3 &Camera::getPixDeltaY() const {
+const AppleMath::Vector3 &Camera::getPixDeltaY() const {
 	return pix_delta_y;
 }
 
@@ -237,14 +237,14 @@ void Camera::setSampleCount(int sample_count) {
 	Camera::sample_count = sample_count;
 }
 
-Math::Vector3 Camera::dofDiskSample() const {
+AppleMath::Vector3 Camera::dofDiskSample() const {
 	auto p = randomVec3InUnitDisk();
 	return position + (p[0] * dof_disk_h) + (p[1] * dof_disk_v);
 }
 
 Color Camera::rayColor(const Ray &ray, const IHittable &object, int depth) {
 	HitRecord record;
-	if(depth <= 0) return {0, 0, 0};
+	if(depth <= 0) return Color{0, 0, 0};
 
 	if (object.hit(ray, Interval(EPS, INF), record)) {
 		Ray scattered;
@@ -253,17 +253,17 @@ Color Camera::rayColor(const Ray &ray, const IHittable &object, int depth) {
 		if (record.material->scatter(ray, record, attenuation, scattered)) {
 			return attenuation.componentProd(rayColor(scattered, object, depth - 1));
 		}
-		return {0, 0, 0};
+		return Color{0, 0, 0};
 	}
 	auto unit = ray.dir().normalized();
-	return Color(std::min(0.5 * unit[0] + 1, 1.0), std::min(0.5 * unit[1] + 1, 1.0), 1);
+	return Color{std::min(0.5 * unit[0] + 1, 1.0), std::min(0.5 * unit[1] + 1, 1.0), 1};
 
 }
 
 int Camera::getSampleCount() const {
 	return sample_count;
 }
-Math::Vector3 Camera::randomDisplacement() const {
+AppleMath::Vector3 Camera::randomDisplacement() const {
 	auto delta_x = pix_delta_x * (randomDouble() - 0.5);
 	auto delta_y = pix_delta_y * (randomDouble() - 0.5);
 	return delta_x + delta_y;

@@ -16,7 +16,7 @@
 #include "MathUtil.h"
 #include "spdlog/spdlog.h"
 #include "KawaiiMQ/kawaiiMQ.h"
-using Color = Math::Vector3;
+using Color = AppleMath::Vector3;
 
 const std::string grayscale = " .:-=+*#%@";
 

@@ -12,12 +12,13 @@
 #include "ImageUtil.h"
 #include "KawaiiMQ/Topic.h"
 #include "MathUtil.h"
+#include "Math/Vector.hpp"
 #include <future>
 #include <thread>
 
 class Camera {
 public:
-	Camera(int width, double aspect_ratio, double fov, Math::Vector3 target, Point3 position, double dof_angle);
+	Camera(int width, double aspect_ratio, double fov, AppleMath::Vector3 target, Point3 position, double dof_angle);
 
 	int getWidth() const;
 
@@ -37,13 +38,13 @@ public:
 
 	const Point3 &getPosition() const;
 
-	const Math::Vector3 &getHoriVec() const;
+	const AppleMath::Vector3 &getHoriVec() const;
 
-	const Math::Vector3 &getVertVec() const;
+	const AppleMath::Vector3 &getVertVec() const;
 
-	const Math::Vector3 &getPixDeltaX() const;
+	const AppleMath::Vector3 &getPixDeltaX() const;
 
-	const Math::Vector3 &getPixDeltaY() const;
+	const AppleMath::Vector3 &getPixDeltaY() const;
 
 	const Point3 &getViewportUl() const;
 
@@ -95,7 +96,7 @@ private:
 
 	void updateVectors();
 
-	Math::Vector3 randomDisplacement() const;
+	AppleMath::Vector3 randomDisplacement() const;
 
 	Point3 dofDiskSample() const;
 
@@ -116,18 +117,18 @@ private:
 	int chunk_dimension;
 	double dof_angle = 0;
 	double shutter_speed = 1;
-	Math::Vector3 u, v, w;
+	AppleMath::Vector3 u, v, w;
 	Point3 position;
 	Point3 target;
-	Math::Vector3 UP = {0, 1, 0};
-	Math::Vector3 hori_vec;
-	Math::Vector3 vert_vec;
-	Math::Vector3 pix_delta_x;
-	Math::Vector3 pix_delta_y;
+	AppleMath::Vector3 UP = AppleMath::Vector3{0, 1, 0};
+	AppleMath::Vector3 hori_vec;
+	AppleMath::Vector3 vert_vec;
+	AppleMath::Vector3 pix_delta_x;
+	AppleMath::Vector3 pix_delta_y;
 	Point3 viewport_ul;
 	Point3 pixel_00;
-	Math::Vector3 dof_disk_h;
-	Math::Vector3 dof_disk_v;
+	AppleMath::Vector3 dof_disk_h;
+	AppleMath::Vector3 dof_disk_v;
 };
 
 #endif // ONEWEEKEND_CAMERA_H

@@ -35,13 +35,12 @@ FetchContent_MakeAvailable(metal)
 set(METAL ${metal_SOURCE_DIR}/SingleHeader)
 list(APPEND METAL "include/metal")
 FetchContent_Declare(
-        Math
+        math
         GIT_REPOSITORY https://github.com/kagurazaka-ayano/AppleMath.git
         GIT_TAG main
 )
-FetchContent_MakeAvailable(Math)
-list(APPEND INCLUDE_SELF ${Math_SOURCE_DIR}/include)
-link_libraries(Math)
+FetchContent_MakeAvailable(math)
+list(APPEND INCLUDE_SELF ${math_SOURCE_DIR}/include)
 
 set(INCLUDE_NORMAL ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES})
 set(INCLUDE_METAL ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES} ${METAL})

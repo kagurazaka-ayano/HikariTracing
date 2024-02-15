@@ -13,7 +13,7 @@
 #include <random>
 #include "spdlog/fmt/fmt.h"
 #include "GlobUtil.hpp"
-#include "Math/Vector.h"
+#include "Math/Vector.hpp"
 
 
 //class Vec3 {
@@ -93,20 +93,20 @@
 //	return {t*v.x, t*v.y, t*v.z};
 //}
 
-using Point3 = Math::Vector3;
+using Point3 = AppleMath::Vector3;
 
 class Ray {
 private:
 	Point3 position;
-	Math::Vector3 direction;
+	AppleMath::Vector3 direction;
 	double tm;
 public:
-	Ray(Math::Vector3 pos, Math::Vector3 dir, double time);
-	Ray(Math::Vector3 pos, Math::Vector3 dir);
+	Ray(AppleMath::Vector3 pos, AppleMath::Vector3 dir, double time);
+	Ray(AppleMath::Vector3 pos, AppleMath::Vector3 dir);
 	Ray() = default;
 
-	Math::Vector3 pos() const;
-	Math::Vector3 dir() const;
+	AppleMath::Vector3 pos() const;
+	AppleMath::Vector3 dir() const;
 	double time() const;
 
 	Point3 at(double t) const;
@@ -163,15 +163,15 @@ inline int randomInt(int min, int max) {
 	return static_cast<int>(randomDouble(min, max + 1));
 }
 
-inline Math::Vector3 randomVec3() {
-	return {randomDouble(), randomDouble(), randomDouble()};
+inline AppleMath::Vector3 randomVec3() {
+	return AppleMath::Vector3{randomDouble(), randomDouble(), randomDouble()};
 }
 
-inline Math::Vector3 randomVec3(double min, double max) {
-	return {randomDouble(min, max), randomDouble(min, max), randomDouble(min, max)};
+inline AppleMath::Vector3 randomVec3(double min, double max) {
+	return AppleMath::Vector3{randomDouble(min, max), randomDouble(min, max), randomDouble(min, max)};
 }
 
-inline Math::Vector3 randomVec3InUnitSphere() {
+inline AppleMath::Vector3 randomVec3InUnitSphere() {
 	while(true) {
 		auto p = randomVec3(-1, 1);
 		if(p.lengthSq() >= 1) continue;
@@ -179,40 +179,40 @@ inline Math::Vector3 randomVec3InUnitSphere() {
 	}
 }
 
-inline Math::Vector3 randomUnitVec3() {
+inline AppleMath::Vector3 randomUnitVec3() {
 	return randomVec3InUnitSphere().normalized();
 }
 
-inline Math::Vector3 randomVec3InUnitDisk() {
+inline AppleMath::Vector3 randomVec3InUnitDisk() {
 	while(true) {
-		auto p = Math::Vector3(randomDouble(-1, 1), randomDouble(-1, 1), 0);
+		auto p = AppleMath::Vector3{randomDouble(-1, 1), randomDouble(-1, 1), 0};
 		if(p.lengthSq() >= 1) continue;
 		return p;
 	}
 }
 
-inline Math::Vector3 randomUnitVec3InHemiSphere(const Math::Vector3 &normal) {
+inline AppleMath::Vector3 randomUnitVec3InHemiSphere(const AppleMath::Vector3 &normal) {
 	auto in_unit_sphere = randomVec3InUnitSphere();
 	if(in_unit_sphere.dot(normal) > 0.0) return in_unit_sphere;
 	else return -in_unit_sphere;
 }
 
-inline Math::Vector3 reflect(const Math::Vector3 &v, const Math::Vector3 &n) {
+inline AppleMath::Vector3 reflect(const AppleMath::Vector3 &v, const AppleMath::Vector3 &n) {
 	return v - 2 * v.dot(n) * n;
 }
 
-inline Math::Vector3 refract(const Math::Vector3 &uv, const Math::Vector3 &n, double etai_over_etat) {
+inline AppleMath::Vector3 refract(const AppleMath::Vector3 &uv, const AppleMath::Vector3 &n, double etai_over_etat) {
 	auto cos_theta = std::fmin(-uv.dot(n), 1.0);
-	Math::Vector3 r_out_perp = etai_over_etat * (uv + cos_theta * n);
-	Math::Vector3 r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.lengthSq())) * n;
+	AppleMath::Vector3 r_out_perp = etai_over_etat * (uv + cos_theta * n);
+	AppleMath::Vector3 r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.lengthSq())) * n;
 	return r_out_perp + r_out_parallel;
 }
 
-inline bool verySmall(const Math::Vector3 &v) {
+inline bool verySmall(const AppleMath::Vector3 &v) {
 	return (std::abs(v[0]) < EPS) && (std::abs(v[1]) < EPS) && (std::abs(v[2]) < EPS);
 }
 
-inline std::string makeColor(const Math::Vector3 &v) {
+inline std::string makeColor(const AppleMath::Vector3 &v) {
 	auto r = static_cast<int>(255.999 * v[0]);
 	auto g = static_cast<int>(255.999 * v[1]);
 	auto b = static_cast<int>(255.999 * v[2]);

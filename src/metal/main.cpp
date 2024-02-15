@@ -5,6 +5,8 @@
 #include <iostream>
 
 int main() {
+    NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
     std::cout << "hello world!";
+    pool->release();
     return 0;
 }
