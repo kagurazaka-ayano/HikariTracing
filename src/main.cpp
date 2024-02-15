@@ -5,27 +5,27 @@
 
 
 int main() {
-	auto camera = Camera(400, 16.0 / 9.0, 30, {0, 0, 0}, {-13, 2, 3}, 0.6);
+	auto camera = Camera(400, 16.0 / 9.0, 30, AppleMath::Vector3{0, 0, 0}, AppleMath::Vector3{-13, 2, 3}, 0.6);
 	auto world = HittableList();
-	auto ground_material = std::make_shared<Metal>(Metal(Color(0.69, 0.72, 0.85), 0.4));
-	auto left_ball_material = std::make_shared<Lambertian>(Lambertian(Color(0.357, 0.816, 0.98)));
-	auto center_ball_material = std::make_shared<Metal>(Metal(Color(0.965, 0.671, 0.729), 0.4));
-	auto right_ball_material = std::make_shared<Dielectric>(Dielectric(1.5, Color(0.8, 0.8, 0.8)));
-	world.add(std::make_shared<Sphere>(Sphere(1000, {0, -1000, -1.0}, ground_material)));
-	world.add(std::make_shared<Sphere>(Sphere(1, {0, 1, 0}, center_ball_material)));
-	world.add(std::make_shared<Sphere>(Sphere(1, {4, 1, 0}, right_ball_material)));
-	world.add(std::make_shared<Sphere>(Sphere(1, {-4, 1, 0}, left_ball_material)));
+	auto ground_material = std::make_shared<Metal>(Metal(Color{0.69, 0.72, 0.85}, 0.4));
+	auto left_ball_material = std::make_shared<Lambertian>(Lambertian(Color{0.357, 0.816, 0.98}));
+	auto center_ball_material = std::make_shared<Metal>(Metal(Color{0.965, 0.671, 0.729}, 0.4));
+	auto right_ball_material = std::make_shared<Dielectric>(Dielectric(1.5, Color{0.8, 0.8, 0.8}));
+	world.add(std::make_shared<Sphere>(Sphere(1000, AppleMath::Vector3{0, -1000, -1.0}, ground_material)));
+	world.add(std::make_shared<Sphere>(Sphere(1, AppleMath::Vector3{0, 1, 0}, center_ball_material)));
+	world.add(std::make_shared<Sphere>(Sphere(1, AppleMath::Vector3{4, 1, 0}, right_ball_material)));
+	world.add(std::make_shared<Sphere>(Sphere(1, AppleMath::Vector3{-4, 1, 0}, left_ball_material)));
 	camera.setSampleCount(60);
 	camera.setShutterSpeed(1.0/24.0);
 	int obj = 0;
 	for(int i = -15; i < 15; i += 2) {
 		for (int j = -15; j < 15; j += 2) {
 			obj++;
-			auto coord = Math::Vector3((i + randomDouble(-1, 1)), 0.2,(j + randomDouble(-1, 1)));
-			auto displacement = Math::Vector3{0, randomDouble(0, 0), 0};
+			auto coord = AppleMath::Vector3{(i + randomDouble(-1, 1)), 0.2,(j + randomDouble(-1, 1))};
+			auto displacement = AppleMath::Vector3{0, randomDouble(0, 0), 0};
 			auto material = static_cast<int>(3.0 * randomDouble());
-			if ((coord - Math::Vector3{0, 1, 0}).length() > 0.9) {
-				Math::Vector3 color = randomVec3().componentProd(randomVec3());
+			if ((coord - AppleMath::Vector3{0, 1, 0}).length() > 0.9) {
+				AppleMath::Vector3 color = randomVec3().componentProd(randomVec3());
 				std::shared_ptr<IMaterial> sphere_mat;
 				switch (material) {
 					case 0:
