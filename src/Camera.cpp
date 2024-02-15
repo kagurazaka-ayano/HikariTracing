@@ -69,8 +69,9 @@ void Camera::RenderWorker(const IHittable &world) {
 	auto task_fetcher = KawaiiMQ::Consumer({task_topic});
 	auto task_queue = m->getAllRelatedQueue(task_topic)[0];
 	spdlog::info("thread {} started", ss.str());
-	while (!task_queue->empty()) {
-		auto chunk = KawaiiMQ::getMessage<ImageChunk>(task_fetcher.fetchSingleTopic(task_topic)[0]);
+	auto chunk_message = std::shared_ptr<KawaiiMQ::MessageData>();
+	while (task_queue->tryWait(chunk_message)) {
+		auto chunk = KawaiiMQ::getMessage<ImageChunk>(chunk_message);
 		spdlog::info("chunk {} (start from ({}, {}), dimension {} * {}) started by thread {}", chunk.chunk_idx,
 					 chunk.startx, chunk.starty, chunk.width, chunk.height, ss.str());
 		for (int i = chunk.starty; i < chunk.starty + chunk.height; i++) {

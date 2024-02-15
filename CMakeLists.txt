@@ -34,15 +34,22 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(math)
 list(APPEND INCLUDE_SELF ${math_SOURCE_DIR}/include)
 
-set(INCLUDE_NORMAL ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES})
-
+set(INCLUDE ${INCLUDE_SELF} ${INCLUDE_THIRDPARTIES})
+include_directories(${INCLUDE})
 add_executable(RaytracingNormal ${SRC_NORMAL})
+add_executable(RaytracingAscii ${SRC_NORMAL})
+target_compile_definitions(RaytracingAscii PUBLIC "ASCII_ART")
 
-target_include_directories(RaytracingNormal PUBLIC ${INCLUDE_NORMAL})
 set_target_properties(
         RaytracingNormal
         PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin/normal/debug"
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/bin/normal/release"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/normal/debug"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/normal/release"
+)
+set_target_properties(
+        RaytracingAscii
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/bin/normal/debug"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/bin/normal/release"
 )
 
