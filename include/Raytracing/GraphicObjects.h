@@ -22,6 +22,8 @@ struct HitRecord {
 	bool hit;
 	Point3 p;
 	double t;
+	double u;
+	double v;
 	AppleMath::Vector3 normal;
 	std::shared_ptr<IMaterial> material;
 	bool front_face;
@@ -69,12 +71,17 @@ public:
 	Sphere(double radius, const Point3& init_position, const Point3& final_position, std::shared_ptr<IMaterial> mat);
 
 	AppleMath::Vector3 getPosition(double time) const;
-	
+
+
+
 	bool hit(const Ray &r, Interval interval, HitRecord& record) const override;
 
 	AABB boundingBox() const override;
 
 private:
+
+	static void getSphereUV(const Point3& p, double& u, double& v);
+
 	AppleMath::Vector3 direction_vec;
 	bool is_moving = false;
 	double radius;

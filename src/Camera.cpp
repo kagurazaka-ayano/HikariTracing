@@ -9,7 +9,7 @@
 #include "Material.h"
 
 
-void Camera::Render(const IHittable& world, const std::string& path, const std::string& name) {
+std::string Camera::Render(const IHittable& world, const std::string& name, const std::string& path) {
 	auto now = std::chrono::system_clock::now();
 	int worker_cnt;
 	if(render_thread_count == 0) {
@@ -52,9 +52,9 @@ void Camera::Render(const IHittable& world, const std::string& path, const std::
 		}
 	}
 #ifndef ASCII_ART
-	makePPM(width, height, image, path, name);
+	return makePPM(width, height, image, name);
 #else
-	makeGrayscaleTxt(width, height, image, path, name);
+	return makeGrayscaleTxt(width, height, image, name);
 #endif
 }
 

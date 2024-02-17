@@ -7,12 +7,14 @@
 
 #include "Material.h"
 
-#include <utility>
-
-
-Lambertian::Lambertian(Color albedo) : albedo(std::move(albedo)) {
+Lambertian::Lambertian(Color albedo) : albedo(std::make_shared<SolidColor>(std::move(albedo))) {
 
 }
+
+Lambertian::Lambertian(std::shared_ptr<ITexture> tex) : albedo(tex) {
+
+}
+
 bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
 						 Ray &scattered) const {
 	auto ray_dir = record.normal + randomUnitVec3();
@@ -20,24 +22,34 @@ bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Ve
 		ray_dir = record.normal;
 	}
 	scattered = Ray(record.p, ray_dir, r_in.time());
-	attenuation = albedo;
+	attenuation = albedo->value(record.u, record.v, record.p);
 	return true;
 }
 
-Metal::Metal(const Color &albedo, double fuzz) : albedo(albedo), fuzz(fuzz) {}
+Metal::Metal(const Color &albedo, double fuzz) : albedo(std::make_shared<SolidColor>(albedo)), fuzz(fuzz) {
+
+}
+
 bool Metal::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
 					Ray &scattered) const {
 	auto ray_dir = reflect(r_in.dir().normalized() + randomUnitVec3() * fuzz, record.normal);
 	scattered = Ray(record.p, ray_dir, r_in.time());
-	attenuation = albedo;
+	attenuation = albedo->value(record.u, record.v, record.p);
 	return true;
 }
+Metal::Metal(const std::shared_ptr<ITexture> &albedo, double fuzz) : albedo(albedo), fuzz(fuzz) {
 
-Dielectric::Dielectric(double idx, const Color &albedo): ir(idx), albedo(albedo) {}
+}
+
+Dielectric::Dielectric(double idx, const std::shared_ptr<ITexture> &albedo): ir(idx), albedo(albedo) {}
+
+Dielectric::Dielectric(double idx, const Color &albedo) : ir(idx), albedo(std::make_shared<SolidColor>(albedo)) {
+
+}
 
 bool Dielectric::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
 						 Ray &scattered) const {
-	attenuation = albedo;
+	attenuation = albedo->value(record.u, record.v, record.p);
 	double ref_ratio = record.front_face ? (1.0 / ir) : ir;
 	auto unit = r_in.dir().normalized();
 
@@ -54,6 +66,7 @@ bool Dielectric::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Ve
 	scattered = Ray(record.p, dir, r_in.time());
 	return true;
 }
+
 double Dielectric::reflectance(double cosine, double refr_idx) {
 	auto r0 = (1 - refr_idx) / (1 + refr_idx);
 	r0 *= r0;

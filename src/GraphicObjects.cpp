@@ -34,11 +34,19 @@ bool Sphere::hit(const Ray &r, Interval interval, HitRecord& record) const {
         }
     }
     record.t = root;
-    record.p = r.at(root);
+    record.p = r.at(record.t);
     auto out_normal = (record.p - sphere_center) / radius;
     record.setFaceNormal(r, out_normal);
+	getSphereUV(out_normal, record.u, record.v);
 	record.material = material;
     return true;
+}
+
+void Sphere::getSphereUV(const Point3 &p, double &u, double &v) {
+	double theta = std::acos(-p[1]);
+	double phi = std::atan2(-p[2], p[0]) + PI;
+	u = phi / (2 * PI);
+	v = theta / PI;
 }
 
 void HitRecord::setFaceNormal(const Ray &r, const AppleMath::Vector3 &normal_out) {

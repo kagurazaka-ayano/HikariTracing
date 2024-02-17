@@ -10,7 +10,7 @@
 
 #include <limits>
 
-const double PI = 3.1415926;
+const double PI = 3.141592;
 const double INF = std::numeric_limits<double>::infinity();
 const double EPS = 1e-3;
 

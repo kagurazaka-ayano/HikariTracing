@@ -12,7 +12,7 @@
 #include "ImageUtil.h"
 #include "KawaiiMQ/Topic.h"
 #include "MathUtil.h"
-#include "Math/Vector.hpp"
+#include "AppleMath/Vector.hpp"
 #include <future>
 #include <thread>
 
@@ -62,7 +62,7 @@ public:
 
 	Ray getRay(int x, int y);
 
-	void Render(const IHittable& world, const std::string& path, const std::string& name);
+	std::string Render(const IHittable& world, const std::string& name, const std::string& path = IMG_OUTPUT_DIR);
 
 	int getRenderDepth() const;
 

@@ -54,6 +54,11 @@ Interval::Interval(const Interval &first, const Interval &second) {
 	min = fmin(first.min, second.min);
 	max = fmax(first.max, second.max);
 }
+double Interval::clamp(double x) const {
+	if (x < min) return min;
+	if (x > max) return max;
+	return x;
+}
 
 AABB::AABB(const Point3 &a, const Point3 &b) {
 	x = Interval(fmin(a[0], b[0]), fmax(a[0], b[0]));

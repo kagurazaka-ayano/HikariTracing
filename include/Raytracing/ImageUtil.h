@@ -13,25 +13,53 @@
 #include <tuple>
 #include <sstream>
 #include <sys/stat.h>
+#include <filesystem>
 #include "MathUtil.h"
 #include "spdlog/spdlog.h"
 #include "KawaiiMQ/kawaiiMQ.h"
+#include "stb_image.h"
 using Color = AppleMath::Vector3;
+
+class Image {
+public:
+	Image();
+
+	~Image();
+
+	Image(const std::string& name, const std::string& parent = IMG_INPUT_DIR);
+
+	bool load(const std::string& name, const std::string& parent = IMG_INPUT_DIR);
+
+	const unsigned char* pixelData(int x, int y) const;
+
+	int width() const;
+
+	int height()const;
+
+private:
+	const int bytes_per_pixel = 3;
+	int bytes_per_scanline;
+	int img_width, img_height;
+	unsigned char* data;
+
+};
 
 const std::string grayscale = " .:-=+*#%@";
 
 std::string getGreyScaleCharacter(double r, double g, double b);
 
-void makePPM(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &path,
-			 const std::string &name);
+std::string makePPM(int width, int height, const std::vector<std::vector<Color>>& img,
+			 const std::string &name, const std::string &path = IMG_OUTPUT_DIR);
 
-void makeGrayscaleTxt(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &path, const std::string &name);
+std::string makeGrayscaleTxt(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &name, const std::string &path = IMG_OUTPUT_DIR);
 
 std::string makeGrayscaleString(int width, int height, std::vector<std::vector<Color>> img);
 
-void mkdir(const std::string& path, const std::string& name);
+std::string mkdir(const std::string &path, const std::string &name);
 
 std::vector<std::string> split(const std::string& str, const std::string& delimeter);
+
+int clamp(int x, int low, int high);
 
 double gammaCorrect(double c);
 

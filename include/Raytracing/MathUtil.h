@@ -13,85 +13,8 @@
 #include <random>
 #include "spdlog/fmt/fmt.h"
 #include "GlobUtil.hpp"
-#include "Math/Vector.hpp"
+#include "AppleMath/Vector.hpp"
 
-
-//class Vec3 {
-//public:
-//	double x, y, z;
-//
-//	Vec3(double x, double y, double z);
-//
-//	Vec3(const Vec3 &other);
-//
-//	Vec3();
-//
-//	Vec3(Vec3 &&other) noexcept;
-//
-//	[[nodiscard]] std::string makeColor() const;
-//
-//	Vec3 &operator=(const Vec3 &other);
-//
-//	double operator[](int i) const;
-//
-//	double operator[](int i);
-//
-//	Vec3 operator-() const;
-//
-//	Vec3 operator-(const Vec3 &other) const;
-//
-//	Vec3 operator+(const Vec3 &other) const;
-//
-//	Vec3 operator*(double t) const;
-//
-//	Vec3 operator/(double t) const;
-//
-//	Vec3 &operator+=(const Vec3 &other);
-//
-//	Vec3 &operator*=(double t);
-//
-//	Vec3 &operator*(const Vec3 &other);
-//
-//	Vec3 &operator/=(double t);
-//
-//	[[nodiscard]] double lengthSq() const;
-//
-//	[[nodiscard]] double length() const;
-//
-//	[[nodiscard]] double dot(const Vec3 &other) const;
-//
-//	[[nodiscard]] Vec3 cross(const Vec3 &other) const;
-//
-//	[[nodiscard]] Vec3 unit() const;
-//
-//	[[nodiscard]] operator std::string() const;
-//
-//	static Vec3 random();
-//
-//	static Vec3 random(double min, double max);
-//
-//	static Vec3 randomVec3InUnitSphere();
-//
-//	static Vec3 randomUnitVec3InHemiSphere(const Vec3 &normal);
-//
-//	static Vec3 randomUnitVec3();
-//
-//	static Vec3 reflect(const Vec3 &v, const Vec3 &n);
-//
-//	static Vec3 refract(const Vec3 &uv, const Vec3 &n, double etai_over_etat);
-//
-//	static Vec3 randomVec3InUnitDisk();
-//
-//	bool verySmall() const;
-//
-//
-//};
-//
-//std::ostream &operator<<(std::ostream &out, const Vec3 &other);
-//
-//inline Vec3 operator*(double t, const Vec3 &v) {
-//	return {t*v.x, t*v.y, t*v.z};
-//}
 
 using Point3 = AppleMath::Vector3;
 
@@ -124,6 +47,8 @@ public:
 	bool within(double x) const;
 
 	bool surround(double x) const;
+
+	double clamp(double x) const;
 
 	static const Interval empty, universe;
 
