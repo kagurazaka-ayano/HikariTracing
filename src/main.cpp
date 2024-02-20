@@ -2,7 +2,7 @@
 
 int main() {
 
-	int option = 2;
+	int option = 4;
 	switch(option) {
 		case 0:
 			randomSpheres();
@@ -13,6 +13,11 @@ int main() {
 		case 2:
 			huajiSphere();
 			break;
+		case 3:
+			perlinSpheres();
+			break;
+		case 4:
+			terrain();
 		default:
 			break;
 	}

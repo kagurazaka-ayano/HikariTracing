@@ -8,12 +8,9 @@
 #ifndef ONEWEEKEND_GRAPHICOBJECTS_H
 #define ONEWEEKEND_GRAPHICOBJECTS_H
 
-#include <chrono>
-#include <future>
+
 #include <memory>
-#include <utility>
 #include <vector>
-#include "ImageUtil.h"
 #include "MathUtil.h"
 
 class IMaterial;

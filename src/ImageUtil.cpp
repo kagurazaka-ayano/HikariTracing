@@ -3,7 +3,7 @@
  * @author ayano
  * @date 1/15/24
  * @brief
-*/
+ */
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_FAILURE_USERMSG
@@ -16,19 +16,17 @@ std::string getGreyScaleCharacter(double r, double g, double b) {
 	return ret.str();
 }
 
-double gammaCorrect(double c) {
-	return std::pow(c, 1.0 / 2.0);
-}
+double gammaCorrect(double c) { return std::pow(c, 1.0 / 2.0); }
 
-std::string makePPM(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &name,
-			 const std::string &path) {
+std::string makePPM(int width, int height, const std::vector<std::vector<Color>> &img, const std::string &name,
+					const std::string &path) {
 	auto fout = std::ofstream();
 	std::string filepath = mkdir(path, name);
 	std::cout << filepath << std::endl;
 	fout.open(filepath);
 	fout << "P3\n" << width << ' ' << height << "\n255\n";
-	for(int i = 0; i < height; i++) {
-		for(int j = 0; j < width; j++) {
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
 			fout << makeColor(img[i][j]);
 		}
 	}
@@ -48,7 +46,8 @@ std::string makeGrayscaleString(int width, int height, std::vector<std::vector<C
 }
 
 
-std::string makeGrayscaleTxt(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &name, const std::string &path) {
+std::string makeGrayscaleTxt(int width, int height, const std::vector<std::vector<Color>> &img, const std::string &name,
+							 const std::string &path) {
 	auto fout = std::ofstream();
 	std::string filepath = mkdir(path, name);
 	fout.open(filepath);
@@ -82,21 +81,19 @@ std::vector<std::string> split(const std::string &str, const std::string &delime
 }
 
 int clamp(int x, int low, int high) {
-	if (x > high) return high - 1;
-	if (x < low) return low;
+	if (x > high)
+		return high - 1;
+	if (x < low)
+		return low;
 	return x;
 }
 
-Image::Image() : data(nullptr) {
+Image::Image() : data(nullptr) {}
 
-}
-
-Image::~Image() {
-	STBI_FREE(data);
-}
+Image::~Image() { STBI_FREE(data); }
 
 Image::Image(const std::string &name, const std::string &parent) {
-	if(!load(name, parent)) {
+	if (!load(name, parent)) {
 		spdlog::critical("cannot load image from path: {}, aborting", mkdir(parent, name));
 		exit(-1);
 	}
@@ -112,21 +109,17 @@ bool Image::load(const std::string &name, const std::string &parent) {
 	return data != nullptr;
 }
 
-int Image::width() const {
-	return img_width;
-}
+int Image::width() const { return img_width; }
 
-int Image::height() const {
-	return img_height;
-}
+int Image::height() const { return img_height; }
 
 const unsigned char *Image::pixelData(int x, int y) const {
 	static unsigned char magenta[] = {255, 0, 255};
-	if (data == nullptr) return magenta;
+	if (data == nullptr)
+		return magenta;
 
 	x = clamp(x, 0, img_width);
 	y = clamp(y, 0, img_height);
 
 	return data + y * bytes_per_scanline + x * bytes_per_pixel;
 }
-

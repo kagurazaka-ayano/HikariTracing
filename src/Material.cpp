@@ -15,8 +15,7 @@ Lambertian::Lambertian(std::shared_ptr<ITexture> tex) : albedo(tex) {
 
 }
 
-bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
-						 Ray &scattered) const {
+bool Lambertian::scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation, Ray &scattered) const {
 	auto ray_dir = record.normal + randomUnitVec3();
 	if (verySmall(ray_dir)) {
 		ray_dir = record.normal;

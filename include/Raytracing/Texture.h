@@ -9,6 +9,7 @@
 #define RAYTRACING_TEXTURE_H
 
 #include "ImageUtil.h"
+#include "MathUtil.h"
 class ITexture {
 public:
 	virtual ~ITexture() = default;
@@ -52,5 +53,28 @@ private:
 	Image img;
 };
 
+class NoiseTexture : public ITexture {
+public:
+	NoiseTexture(double frequency, int octave_count, double persistence);
+
+	Color value(double u, double v, const Point3& p) const override;
+private:
+	Perlin noise;
+	double frequency;
+	int octave_count;
+	double persistence;
+};
+
+class TerrainTexture : public ITexture {
+public:
+	TerrainTexture(double frequency, int octave_count, double persistence);
+
+	Color value(double u, double v, const Point3& p) const override;
+private:
+	Perlin noise;
+	double frequency;
+	int octave_count;
+	double persistence;
+};
 
 #endif // RAYTRACING_TEXTURE_H

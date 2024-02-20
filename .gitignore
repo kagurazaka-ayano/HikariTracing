@@ -47,4 +47,8 @@ img/output
 # apple
 .DS_Store
 
-cmake
+# clangd
+.cache
+
+# time tracker
+.timetracker

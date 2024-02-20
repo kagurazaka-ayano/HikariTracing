@@ -114,7 +114,7 @@ private:
 	int sample_count = 20;
 	int render_depth = 50;
 	int render_thread_count = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
-	int chunk_dimension;
+	int chunk_dimension = width / render_thread_count < 0 ? width : width / render_thread_count;
 	double dof_angle = 0;
 	double shutter_speed = 1;
 	AppleMath::Vector3 u, v, w;

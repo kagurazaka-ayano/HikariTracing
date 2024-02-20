@@ -6,6 +6,23 @@
  */
 
 #include "scenes.h"
+#include <memory>
+#include "AppleMath/Vector.hpp"
+#include "Camera.h"
+#include "GraphicObjects.h"
+#include "MathUtil.h"
+#include "Texture.h"
+#include "Material.h"
+
+void render(HittableList world, Camera camera) {
+#ifndef ASCII_ART
+	auto file = camera.Render(world, "test.ppm");
+	system(std::string("open " + file).c_str());
+#else
+	auto file = camera.Render(world, "test.txt");
+	system(std::string("open " + file).c_str());
+#endif
+}
 
 void randomSpheres() {
 
@@ -61,15 +78,6 @@ void randomSpheres() {
 	render(world, camera);
 }
 
-void render(HittableList world, Camera camera) {
-#ifndef ASCII_ART
-	auto file = camera.Render(world, "test.ppm");
-	system(std::string("open " + file).c_str());
-#else
-	auto file = camera.Render(world, "test.txt");
-	system(std::string("open " + file).c_str());
-#endif
-}
 void twoSpheres() {
 	auto camera = Camera(400, 16.0 / 9.0, 30, AppleMath::Vector3{0, 0, -30}, AppleMath::Vector3{0, 0, 0}, 0.6);
 	camera.setSampleCount(100);
@@ -85,6 +93,7 @@ void twoSpheres() {
 	world = HittableList(std::make_shared<BVHNode>(world));
 	render(world, camera);
 }
+
 void huajiSphere() {
 	auto camera = Camera(1920, 16.0 / 9.0, 45, AppleMath::Vector3{0, 0, -30}, AppleMath::Vector3{30, 0, -30}, 0.1);
 	camera.setSampleCount(100);
@@ -99,3 +108,36 @@ void huajiSphere() {
 	world = HittableList(std::make_shared<BVHNode>(world));
 	render(world, camera);
 }
+
+void perlinSpheres()
+{
+	HittableList world; 
+	Camera camera(1920, 16.0 / 9.0, 20, Point3{0, 0, 0}, Point3{13, 2, 3}, 0);
+	camera.setSampleCount(100);
+	camera.setShutterSpeed(1.0/24.0);
+	camera.setRenderDepth(50);
+	camera.setRenderThreadCount(12);
+	camera.setChunkDimension(64);
+	auto tex = std::make_shared<NoiseTexture>(1, 10, 0.5);
+	world.add(std::make_shared<Sphere>(1000, Point3{0, -1000, 0}, std::make_shared<Lambertian>(tex)));
+	world.add(std::make_shared<Sphere>(2, Point3{0, 2, 0}, std::make_shared<Lambertian>(tex)));
+
+	render(world, camera);
+}
+
+void terrain()
+{
+	HittableList world; 
+	Camera camera(100, 16.0 / 9.0, 20, Point3{0, 0, 0}, Point3{0, 0, -50}, 0);
+	camera.setSampleCount(10);
+	camera.setShutterSpeed(1.0/24.0);
+	camera.setRenderDepth(4);
+	camera.setRenderThreadCount(12);
+	camera.setChunkDimension(64);
+	auto tex = std::make_shared<TerrainTexture>(0.5, 10, 0.5);
+	world.add(std::make_shared<Sphere>(10, Point3{0, 0, 0}, std::make_shared<Lambertian>(tex)));
+
+	render(world, camera);
+}
+
+

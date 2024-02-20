@@ -8,17 +8,18 @@
 #ifndef RAYTRACING_SCENES_H
 #define RAYTRACING_SCENES_H
 
-#include "ImageUtil.h"
 #include "GraphicObjects.h"
-#include "Material.h"
 #include "Camera.h"
-#include "Texture.h"
 
 void randomSpheres();
 
 void twoSpheres();
 
 void huajiSphere();
+
+void perlinSpheres();
+
+void terrain();
 
 void render(HittableList object, Camera camera);
 
