@@ -13,12 +13,13 @@
 #include "KawaiiMQ/Topic.h"
 #include "MathUtil.h"
 #include "AppleMath/Vector.hpp"
+#include "spdlog/fmt/bundled/core.h"
 #include <future>
 #include <thread>
 
 class Camera {
 public:
-	Camera(int width, double aspect_ratio, double fov, AppleMath::Vector3 target, Point3 position, double dof_angle);
+	Camera(int width, double aspect_ratio, double fov, Point3 position, AppleMath::Vector3 initial_facing, AppleMath::Vector3 initial_rotation, double dof_angle);
 
 	int getWidth() const;
 
@@ -90,6 +91,10 @@ public:
 
 	void setShutterSpeed(double shutterSpeed);
 
+	void setRotation(const AppleMath::Vector3& rot);
+
+	AppleMath::Vector3 getRotation() const;
+	
 private:
 
 	Color rayColor(const Ray &ray, const IHittable &object, int depth);
@@ -103,7 +108,7 @@ private:
 	void RenderWorker(const IHittable &world);
 
 	int partition() const;
-	
+
 	int width;
 	int height;
 	double aspect_ratio;
@@ -119,7 +124,8 @@ private:
 	double shutter_speed = 1;
 	AppleMath::Vector3 u, v, w;
 	Point3 position;
-	Point3 target;
+	AppleMath::Vector3 rotation_rad = {0, 0, 0};
+	Point3 facing;
 	AppleMath::Vector3 UP = AppleMath::Vector3{0, 1, 0};
 	AppleMath::Vector3 hori_vec;
 	AppleMath::Vector3 vert_vec;

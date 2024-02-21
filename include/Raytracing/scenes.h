@@ -8,8 +8,7 @@
 #ifndef RAYTRACING_SCENES_H
 #define RAYTRACING_SCENES_H
 
-#include "GraphicObjects.h"
-#include "Camera.h"
+
 
 void randomSpheres();
 
@@ -21,6 +20,6 @@ void perlinSpheres();
 
 void terrain();
 
-void render(HittableList object, Camera camera);
+void rotationTest();
 
 #endif // RAYTRACING_SCENES_H

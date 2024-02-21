@@ -2,8 +2,7 @@
 
 int main() {
 
-	int option = 4;
-	switch(option) {
+	switch(5) {
 		case 0:
 			randomSpheres();
 			break;
@@ -18,6 +17,10 @@ int main() {
 			break;
 		case 4:
 			terrain();
+			break;
+		case 5:
+			rotationTest();
+			break;
 		default:
 			break;
 	}

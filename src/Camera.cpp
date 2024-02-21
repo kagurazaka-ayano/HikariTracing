@@ -6,7 +6,10 @@
  */
 
 #include "Camera.h"
+#include <string>
+#include "AppleMath/Vector.hpp"
 #include "Material.h"
+#include "AppleMath/Matrix.hpp"
 
 
 std::string Camera::Render(const IHittable& world, const std::string& name, const std::string& path) {
@@ -51,8 +54,9 @@ std::string Camera::Render(const IHittable& world, const std::string& name, cons
 			}
 		}
 	}
+	m->unrelate(result_topic, result_queue);
 #ifndef ASCII_ART
-	return makePPM(width, height, image, name);
+	return makePPM(width, height, image, name, path);
 #else
 	return makeGrayscaleTxt(width, height, image, name);
 #endif
@@ -92,6 +96,14 @@ void Camera::RenderWorker(const IHittable &world) {
 		auto message = KawaiiMQ::makeMessage(chunk);
 		result_producer.broadcastMessage(message);
 	}
+	task_fetcher.unsubscribe(task_topic);
+	result_producer.unsubscribe(result_topic);
+	try {
+		m->unrelate(task_topic, task_queue);
+	}
+	catch (...) {
+
+	}
 }
 
 int Camera::partition() const {
@@ -130,11 +142,23 @@ int Camera::partition() const {
 		upperleft_x = 0;
 		upperleft_y += chunk_dimension;
 	}
+	prod.unsubscribe(topic);
 	return idx;
 }
 
-Camera::Camera(int width, double aspect_ratio, double fov, AppleMath::Vector3 target, Point3 position, double dof_angle) : width(width), aspect_ratio(aspect_ratio),
-	fov(fov), target(std::move(target)),
+void Camera::setRotation(const AppleMath::Vector3& rot)
+{
+	rotation_rad = rot;
+	updateVectors();
+}
+
+AppleMath::Vector3 Camera::getRotation() const
+{
+	return rotation_rad;
+}
+
+Camera::Camera(int width, double aspect_ratio, double fov, Point3 position, AppleMath::Vector3 initial_facing, AppleMath::Vector3 initial_rotation, double dof_angle) : width(width), aspect_ratio(aspect_ratio),
+	fov(fov), rotation_rad(std::move(initial_rotation)), facing(std::move(initial_facing)),
 	position(std::move(position)),
 	height(static_cast<int>(width / aspect_ratio)), dof_angle(dof_angle){
 	render_thread_count = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
@@ -143,13 +167,19 @@ Camera::Camera(int width, double aspect_ratio, double fov, AppleMath::Vector3 ta
 }
 
 void Camera::updateVectors() {
+	auto rotations = AppleMath::makeRotationMatrixR3(rotation_rad[0], rotation_rad[1], rotation_rad[2]);
 	auto theta = deg2Rad(fov);
 	auto h = tan(theta / 2);
-	focal_len = (position - target).length();
+	focal_len = (position - facing).length();
 	viewport_height = 2 * h * focal_len;
 	viewport_width = viewport_height * (static_cast<double>(width) / height);
-	w = (position - target).normalized();
-	u = UP.cross(w).normalized();
+	w = AppleMath::applyTrans(facing.normalized(), rotations["x"]);
+	w = AppleMath::applyTrans(w, rotations["y"]);
+	w = AppleMath::applyTrans(w, rotations["z"]);
+	auto this_UP = AppleMath::applyTrans(UP, rotations["x"]);
+	this_UP = AppleMath::applyTrans(this_UP, rotations["y"]);
+	this_UP = AppleMath::applyTrans(this_UP, rotations["z"]);
+	u = this_UP.cross(w).normalized();
 	v = w.cross(u);
 	hori_vec = viewport_width * u;
 	vert_vec = viewport_height * -v;
@@ -294,11 +324,11 @@ double Camera::getFov() const {
 	return fov;
 }
 const Point3 &Camera::getTarget() const {
-	return target;
+	return facing;
 }
 
 void Camera::setTarget(const Point3 &target) {
-	Camera::target = target;
+	Camera::facing = target;
 }
 double Camera::getDofAngle() const {
 	return dof_angle;
