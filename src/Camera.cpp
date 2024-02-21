@@ -98,12 +98,9 @@ void Camera::RenderWorker(const IHittable &world) {
 	}
 	task_fetcher.unsubscribe(task_topic);
 	result_producer.unsubscribe(result_topic);
-	try {
-		m->unrelate(task_topic, task_queue);
-	}
-	catch (...) {
 
-	}
+	m->unrelate(task_topic, task_queue);
+
 }
 
 int Camera::partition() const {

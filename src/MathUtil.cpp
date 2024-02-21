@@ -9,6 +9,7 @@
 #include <cmath>
 #include <simd/quaternion.h>
 #include "AppleMath/Vector.hpp"
+#include <iostream>
 
 
 std::ostream &operator<<(std::ostream &out, const AppleMath::Vector3 &other) {

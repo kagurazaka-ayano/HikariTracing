@@ -9,7 +9,6 @@
 #define ONEWEEKEND_MATHUTIL_H
 
 #include <cmath>
-#include <iostream>
 #include <random>
 #include "AppleMath/Vector.hpp"
 #include "GlobUtil.hpp"
