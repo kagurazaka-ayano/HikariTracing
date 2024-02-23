@@ -19,7 +19,7 @@
 
 class Camera {
 public:
-	Camera(int width, double aspect_ratio, double fov, Point3 position, AppleMath::Vector3 initial_facing, AppleMath::Vector3 initial_rotation, double dof_angle);
+	Camera(int width, double aspect_ratio, double fov, Point3 position, AppleMath::Vector3 target, double dof_angle);
 
 	int getWidth() const;
 
@@ -125,7 +125,7 @@ private:
 	AppleMath::Vector3 u, v, w;
 	Point3 position;
 	AppleMath::Vector3 rotation_rad = {0, 0, 0};
-	Point3 facing;
+	Point3 target;
 	AppleMath::Vector3 UP = AppleMath::Vector3{0, 1, 0};
 	AppleMath::Vector3 hori_vec;
 	AppleMath::Vector3 vert_vec;

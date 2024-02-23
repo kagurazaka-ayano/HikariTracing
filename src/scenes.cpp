@@ -11,11 +11,12 @@
 #include "AppleMath/Vector.hpp"
 #include "Camera.h"
 #include "GraphicObjects.h"
+#include "Material.h"
 #include "MathUtil.h"
 #include "Texture.h"
-#include "Material.h"
 
-void render(HittableList world, Camera camera, const std::string& name = "test.ppm", const std::string path = IMG_OUTPUT_DIR) {
+void render(HittableList world, Camera camera, const std::string &name = "test.ppm",
+			const std::string path = IMG_OUTPUT_DIR) {
 #ifndef ASCII_ART
 	auto file = camera.Render(world, name, path);
 	// system(std::string("open " + file).c_str());
@@ -27,10 +28,10 @@ void render(HittableList world, Camera camera, const std::string& name = "test.p
 
 void randomSpheres() {
 
-	auto camera = Camera(1920, 16.0 / 9.0, 30, {0, 0, 0}, {-13, 2, 3}, {0, 0, 0}, 0.6);
+	auto camera = Camera(400, 16.0 / 9.0, 30, {-13, 2, 3}, {0, 0, 0}, 0.6);
 
 	camera.setSampleCount(100);
-	camera.setShutterSpeed(1.0/24.0);
+	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
@@ -45,10 +46,10 @@ void randomSpheres() {
 	world.add(std::make_shared<Sphere>(Sphere(1, AppleMath::Vector3{4, 1, 0}, right_ball_material)));
 	world.add(std::make_shared<Sphere>(Sphere(1, AppleMath::Vector3{-4, 1, 0}, left_ball_material)));
 	int obj = 0;
-	for(int i = -11; i < 11; i += 2) {
+	for (int i = -11; i < 11; i += 2) {
 		for (int j = -11; j < 11; j += 2) {
 			obj++;
-			auto coord = AppleMath::Vector3{(i + randomDouble(-1, 1)), 0.2,(j + randomDouble(-1, 1))};
+			auto coord = AppleMath::Vector3{(i + randomDouble(-1, 1)), 0.2, (j + randomDouble(-1, 1))};
 			auto displacement = AppleMath::Vector3{0, randomDouble(0, 0), 0};
 			auto material = static_cast<int>(3.0 * randomDouble());
 			if ((coord - AppleMath::Vector3{0, 1, 0}).length() > 0.9) {
@@ -71,35 +72,34 @@ void randomSpheres() {
 					default:
 						break;
 				}
-
 			}
 		}
 	}
 	world = HittableList(std::make_shared<BVHNode>(world));
-	render(world, camera);
+	render(world, camera, "randomSpheres.ppm");
 }
 
 void twoSpheres() {
-	auto camera = Camera(400, 16.0 / 9.0, 30,{0, 0, 0}, {0, 0, -30}, {PI / 4, 0, PI / 8}, 0.6);
+	auto camera = Camera(400, 16.0 / 9.0, 30, {0, 0, 0}, {0, 0, -30}, 0.6);
 	camera.setSampleCount(100);
-	camera.setShutterSpeed(1.0/24.0);
+	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
-	
+
 	auto world = HittableList();
 	auto checker = std::make_shared<CheckerTexture>(2, Color{0.1, 0.1, 0.1}, Color{0.9, 0.9, 0.9});
 	auto sphere_material = std::make_shared<Lambertian>(Lambertian(checker));
 	world.add(std::make_shared<Sphere>(20.0, Point3{0, -20.0, -30}, sphere_material));
 	world.add(std::make_shared<Sphere>(20.0, Point3{0, 20.0, -30}, sphere_material));
 	world = HittableList(std::make_shared<BVHNode>(world));
-	render(world, camera);
+	render(world, camera, "twoSpheres.ppm");
 }
 
 void huajiSphere() {
-	auto camera = Camera(1920, 16.0 / 9.0, 45, {0, 0, -30}, {30, 0, -30}, {0, 0, 0},  0.1);
+	auto camera = Camera(400, 16.0 / 9.0, 45, {30, 0, -30}, {0, 0, -30}, 0.1);
 	camera.setSampleCount(100);
-	camera.setShutterSpeed(1.0/24.0);
+	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
@@ -108,15 +108,14 @@ void huajiSphere() {
 	auto huaji_material = std::make_shared<Lambertian>(huaji_texture);
 	world.add(std::make_shared<Sphere>(10.0, Point3{0, 0, -30}, huaji_material));
 	world = HittableList(std::make_shared<BVHNode>(world));
-	render(world, camera);
+	render(world, camera, "huajiSphere.ppm");
 }
 
-void perlinSpheres()
-{
-	HittableList world; 
-	Camera camera(1920, 16.0 / 9.0, 20, Point3{0, 0, 0}, Point3{13, 2, 3}, {0, 0, 0}, 0);
+void perlinSpheres() {
+	HittableList world;
+	Camera camera(400, 16.0 / 9.0, 20, Point3{-13, 2, 3}, Point3{0, 0, 0}, 0);
 	camera.setSampleCount(100);
-	camera.setShutterSpeed(1.0/24.0);
+	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
@@ -124,29 +123,28 @@ void perlinSpheres()
 	world.add(std::make_shared<Sphere>(1000, Point3{0, -1000, 0}, std::make_shared<Lambertian>(tex)));
 	world.add(std::make_shared<Sphere>(2, Point3{0, 2, 0}, std::make_shared<Lambertian>(tex)));
 
-	render(world, camera);
+	render(world, camera, "perlinSpheres.ppm");
 }
 
-void terrain()
-{
-	HittableList world; 
-	Camera camera(1920, 16.0 / 9.0, 20, Point3{0, 0, 0}, Point3{0, 0, -50}, {0, 0, 0}, 0);
+void terrain() {
+	HittableList world;
+	Camera camera(400, 16.0 / 9.0, 20, Point3{0, 0, -50}, Point3{0, 0, 0}, 0);
 	camera.setSampleCount(10);
-	camera.setShutterSpeed(1.0/24.0);
+	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(4);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
 	auto tex = std::make_shared<TerrainTexture>(0.5, 10, 0.5);
 	world.add(std::make_shared<Sphere>(10, Point3{0, 0, 0}, std::make_shared<Lambertian>(tex)));
 
-	render(world, camera);
+	render(world, camera, "terrain.ppm");
 }
 
 void rotationTest() {
 	HittableList world;
-	Camera camera(400, 16.0 / 9.0, 30, {0, 0, 0}, {0, 0, 1}, {0, 0, 0}, 0);
+	Camera camera(400, 16.0 / 9.0, 30, {0, 0, 0}, {0, 0, 1}, 0);
 	camera.setSampleCount(10);
-	camera.setShutterSpeed(1.0/24.0);
+	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(4);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
@@ -166,22 +164,23 @@ void rotationTest() {
 
 	world = HittableList(std::make_shared<BVHNode>(world));
 	auto rot_init = AppleMath::Vector3{0, 2 * PI / 36, 0};
-	for(int i = 0; i < 36; ++i) {
+	for (int i = 0; i < 36; ++i) {
 		camera.setRotation(rot_init * i);
-		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm", std::string(IMG_OUTPUT_DIR) + "/theta");
+		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm",
+			   std::string(IMG_OUTPUT_DIR) + "/theta");
 	}
 	camera.setRotation({0, 0, 0});
 	rot_init = AppleMath::Vector3{2 * PI / 36, 0, 0};
-	for(int i = 0; i < 36; ++i) {
+	for (int i = 0; i < 36; ++i) {
 		camera.setRotation(rot_init * i);
-		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm", std::string(IMG_OUTPUT_DIR) + "/phi");
+		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm",
+			   std::string(IMG_OUTPUT_DIR) + "/phi");
 	}
 	camera.setRotation({0, 0, 0});
 	rot_init = AppleMath::Vector3{0, 0, 2 * PI / 36};
-	for(int i = 0; i < 36; ++i) {
+	for (int i = 0; i < 36; ++i) {
 		camera.setRotation(rot_init * i);
-		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm", std::string(IMG_OUTPUT_DIR) + "/eta");
+		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm",
+			   std::string(IMG_OUTPUT_DIR) + "/psi");
 	}
 }
-
-

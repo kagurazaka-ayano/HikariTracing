@@ -4,6 +4,8 @@ include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 23)
 
+set(CMAKE_GENERATOR "Ninja" CACHE INTERNAL "Ninja" FORCE)
+
 file(GLOB SRC_NORMAL "./src/*.cpp")
 file(GLOB SRC_NORMAL_NO_MAIN "./src/*.cpp")
 list(FILTER SRC_NORMAL_NO_MAIN EXCLUDE REGEX ".*main.cpp")

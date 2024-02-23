@@ -154,28 +154,28 @@ AppleMath::Vector3 Camera::getRotation() const
 	return rotation_rad;
 }
 
-Camera::Camera(int width, double aspect_ratio, double fov, Point3 position, AppleMath::Vector3 initial_facing, AppleMath::Vector3 initial_rotation, double dof_angle) : width(width), aspect_ratio(aspect_ratio),
-	fov(fov), rotation_rad(std::move(initial_rotation)), facing(std::move(initial_facing)),
+Camera::Camera(int width, double aspect_ratio, double fov, Point3 position, AppleMath::Vector3 target, double dof_angle) : width(width), aspect_ratio(aspect_ratio),
+	fov(fov), target(std::move(target)),
 	position(std::move(position)),
 	height(static_cast<int>(width / aspect_ratio)), dof_angle(dof_angle){
 	render_thread_count = std::thread::hardware_concurrency() == 0 ? 12 : std::thread::hardware_concurrency();
+	auto angle = AppleMath::getAngleBetweenR3(AppleMath::Vector3{0, 0, 1}, (position - target).normalized());
+	rotation_rad = AppleMath::Vector3{angle.at("psi"), angle.at("theta"), angle.at("phi")};
 	updateVectors();
 
 }
 
 void Camera::updateVectors() {
-	auto rotations = AppleMath::makeRotationMatrixR3(rotation_rad[0], rotation_rad[1], rotation_rad[2]);
 	auto theta = deg2Rad(fov);
 	auto h = tan(theta / 2);
-	focal_len = (position - facing).length();
+	focal_len = (position - target).length();
 	viewport_height = 2 * h * focal_len;
 	viewport_width = viewport_height * (static_cast<double>(width) / height);
-	w = AppleMath::applyTrans(facing.normalized(), rotations["x"]);
-	w = AppleMath::applyTrans(w, rotations["y"]);
-	w = AppleMath::applyTrans(w, rotations["z"]);
-	auto this_UP = AppleMath::applyTrans(UP, rotations["x"]);
-	this_UP = AppleMath::applyTrans(this_UP, rotations["y"]);
-	this_UP = AppleMath::applyTrans(this_UP, rotations["z"]);
+	auto rotations = AppleMath::makeEulerRotationMatrixR3(rotation_rad[0], rotation_rad[1], rotation_rad[2]);
+	w = AppleMath::applyTrans({0, 0, 1}, rotations).normalized();
+	auto this_UP = UP;
+	if(rotation_rad[0] > PI / 2 && rotation_rad[0] < 3 * PI / 2)
+		this_UP = -UP;
 	u = this_UP.cross(w).normalized();
 	v = w.cross(u);
 	hori_vec = viewport_width * u;
@@ -321,11 +321,11 @@ double Camera::getFov() const {
 	return fov;
 }
 const Point3 &Camera::getTarget() const {
-	return facing;
+	return target;
 }
 
 void Camera::setTarget(const Point3 &target) {
-	Camera::facing = target;
+	Camera::target = target;
 }
 double Camera::getDofAngle() const {
 	return dof_angle;
