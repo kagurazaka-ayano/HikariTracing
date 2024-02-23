@@ -28,11 +28,7 @@ void render(HittableList world, Camera camera, const std::string &name = "test.p
 
 void randomSpheres() {
 
-<<<<<<< Updated upstream
 	auto camera = Camera(400, 16.0 / 9.0, 30, {-13, 2, 3}, {0, 0, 0}, 0.6);
-=======
-	auto camera = Camera(200, 16.0 / 9.0, 30, {-13, 2, 3}, {0, 0, 0}, {0, 0, 0}, 0.6);
->>>>>>> Stashed changes
 
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
@@ -84,11 +80,7 @@ void randomSpheres() {
 }
 
 void twoSpheres() {
-<<<<<<< Updated upstream
 	auto camera = Camera(400, 16.0 / 9.0, 30, {0, 0, 0}, {0, 0, -30}, 0.6);
-=======
-	auto camera = Camera(400, 16.0 / 9.0, 30,{0, 0, -30}, {0, 0, 0}, {PI / 4, 0, PI / 8}, 0.6);
->>>>>>> Stashed changes
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
@@ -119,16 +111,9 @@ void huajiSphere() {
 	render(world, camera, "huajiSphere.ppm");
 }
 
-<<<<<<< Updated upstream
 void perlinSpheres() {
 	HittableList world;
 	Camera camera(400, 16.0 / 9.0, 20, Point3{-13, 2, 3}, Point3{0, 0, 0}, 0);
-=======
-void perlinSpheres()
-{
-	HittableList world; 
-	Camera camera(400, 16.0 / 9.0, 20, Point3{13, 2, 3}, Point3{0, 0, 0}, {0, 0, 0}, 0);
->>>>>>> Stashed changes
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
@@ -141,16 +126,9 @@ void perlinSpheres()
 	render(world, camera, "perlinSpheres.ppm");
 }
 
-<<<<<<< Updated upstream
 void terrain() {
 	HittableList world;
 	Camera camera(400, 16.0 / 9.0, 20, Point3{0, 0, -50}, Point3{0, 0, 0}, 0);
-=======
-void terrain()
-{
-	HittableList world; 
-	Camera camera(400, 16.0 / 9.0, 30, {0, 0, 50}, {0, 0, 1}, {0, 0, 0}, 0);
->>>>>>> Stashed changes
 	camera.setSampleCount(10);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(4);
@@ -202,11 +180,7 @@ void rotationTest() {
 	rot_init = AppleMath::Vector3{0, 0, 2 * PI / 36};
 	for (int i = 0; i < 36; ++i) {
 		camera.setRotation(rot_init * i);
-<<<<<<< Updated upstream
 		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm",
 			   std::string(IMG_OUTPUT_DIR) + "/psi");
-=======
-		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm", std::string(IMG_OUTPUT_DIR) + "/psi");
->>>>>>> Stashed changes
 	}
 }
