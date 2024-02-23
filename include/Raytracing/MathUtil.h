@@ -50,6 +50,8 @@ public:
 
 	double clamp(double x) const;
 
+	Interval expand(double delta);
+
 	static const Interval empty, universe;
 };
 const static Interval empty(+INF, -INF);
@@ -68,6 +70,8 @@ public:
 	AABB(const AABB &up, const AABB &down);
 
 	Interval axis(int i) const;
+
+	AABB pad();
 
 	[[nodiscard]] bool hit(const Ray &r, Interval ray_int) const;
 };

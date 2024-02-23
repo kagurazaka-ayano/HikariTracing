@@ -37,12 +37,18 @@ Interval::Interval(const Interval &first, const Interval &second) {
 	min = fmin(first.min, second.min);
 	max = fmax(first.max, second.max);
 }
+
 double Interval::clamp(double x) const {
 	if (x < min)
 		return min;
 	if (x > max)
 		return max;
 	return x;
+}
+
+Interval Interval::expand(double delta) {
+	auto padding = delta / 2;
+	return Interval(min - padding, max + padding);
 }
 
 AABB::AABB(const Point3 &a, const Point3 &b) {
@@ -78,6 +84,9 @@ bool AABB::hit(const Ray &r, Interval ray_int) const {
 			std::swap(t0, t1);
 		}
 
+		if (t0 > ray_int.min) ray_int.min = t0;
+		if (t1 < ray_int.max) ray_int.max = t1;
+
 		if (ray_int.max < ray_int.min) {
 			return false;
 		}
@@ -88,6 +97,17 @@ AABB::AABB(const AABB &up, const AABB &down) {
 	x = Interval(up.x, down.x);
 	y = Interval(up.y, down.y);
 	z = Interval(up.z, down.z);
+}
+
+AABB AABB::pad() {
+	double delta = 0.0001;
+	double size_x = x.max - x.min;
+	double size_y = y.max - y.min;
+	double size_z = z.max - z.min;
+	Interval new_x = (size_x >= delta ? x : x.expand(delta));
+	Interval new_y = (size_y >= delta ? y : y.expand(delta));
+	Interval new_z = (size_z >= delta ? z : z.expand(delta));
+	return AABB(new_x, new_y, new_z);
 }
 
 double Perlin::gradientDotProd(int hash, const AppleMath::Vector3 &pt) const {

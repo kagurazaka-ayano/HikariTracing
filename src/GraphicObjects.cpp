@@ -176,3 +176,53 @@ BVHNode::BVHNode(const std::vector<std::shared_ptr<IHittable>> &objects, size_t 
 
 	bbox = AABB(left->boundingBox(), right->boundingBox());
 }
+
+AABB Quad::boundingBox() const {
+	return bbox;
+}
+
+void Quad::setBoundingBox() {
+	bbox = AABB(Q, Q + u + v).pad();
+}
+
+Quad::Quad(const AppleMath::Vector3& Q, const AppleMath::Vector3& u, const AppleMath::Vector3& v, std::shared_ptr<IMaterial> mat) :
+Q(Q), u(u), v(v), mat(mat)
+{
+	normal = u.cross(v).normalized();
+	D = normal.dot(Q);
+	w = normal / normal.dot(normal);
+	setBoundingBox();
+}
+
+bool Quad::inside(double a, double b, HitRecord& rec) const {
+	if (a < 0 || a > 1 || b < 0 || b > 1) return false;
+	rec.u = a;
+	rec.v = b;
+	return true;
+}
+
+
+bool Quad::hit(const Ray& r, Interval interval, HitRecord& record) const {
+	double denom = normal.dot(r.dir());
+	if (fabs(denom) < 1e-8) {
+		return false;
+	}
+	auto t = (D - normal.dot(r.pos())) / denom;
+	if(!interval.surround(t)) {
+		return false;
+	}
+	auto intersection = r.at(t);
+	auto plane_hit_vect = intersection - Q;
+	auto alpha = w.dot(plane_hit_vect.cross(v));
+	auto beta = w.dot(u.cross(plane_hit_vect));
+
+	if (!inside(alpha, beta, record)) {
+		return false;
+	}
+	record.t = t;
+	record.p = intersection;
+	record.material = mat;
+	record.setFaceNormal(r, normal);
+
+	return true;
+}

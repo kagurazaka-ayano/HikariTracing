@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <vector>
+#include "AppleMath/Vector.hpp"
 #include "MathUtil.h"
 
 class IMaterial;
@@ -111,6 +112,30 @@ private:
 	static bool compareZ(const std::shared_ptr<IHittable>& a, const std::shared_ptr<IHittable>& b);
 
 	AABB bbox;
+};
+
+class Quad : public IHittable {
+public:
+	Quad(const AppleMath::Vector3& Q, const AppleMath::Vector3& u, const AppleMath::Vector3& v, std::shared_ptr<IMaterial> mat);
+
+	virtual ~Quad() = default;
+
+	AABB boundingBox() const override;
+
+	virtual void setBoundingBox();
+
+	bool hit(const Ray& r, Interval interval, HitRecord& record) const override;
+
+	bool inside(double a, double b, HitRecord& rec) const;
+
+private:
+	AppleMath::Vector3 Q, u, v;
+	AppleMath::Vector3 normal;
+	double D;
+	AppleMath::Vector3 w;
+	std::shared_ptr<IMaterial> mat;
+	AABB bbox;
+	
 };
 
 
