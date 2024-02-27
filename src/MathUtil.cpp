@@ -104,9 +104,9 @@ AABB AABB::pad() {
 	double size_x = x.max - x.min;
 	double size_y = y.max - y.min;
 	double size_z = z.max - z.min;
-	Interval new_x = (size_x >= delta ? x : x.expand(delta));
-	Interval new_y = (size_y >= delta ? y : y.expand(delta));
-	Interval new_z = (size_z >= delta ? z : z.expand(delta));
+	Interval new_x = (fabs(size_x) >= delta ? x : x.expand(delta));
+	Interval new_y = (fabs(size_y) >= delta ? y : y.expand(delta));
+	Interval new_z = (fabs(size_z) >= delta ? z : z.expand(delta));
 	return AABB(new_x, new_y, new_z);
 }
 

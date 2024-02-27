@@ -22,4 +22,8 @@ void terrain();
 
 void rotationTest();
 
+void quads();
+
+void triangles();
+
 #endif // RAYTRACING_SCENES_H

@@ -11,6 +11,7 @@
 #include "AppleMath/Vector.hpp"
 #include "Camera.h"
 #include "GraphicObjects.h"
+#include "ImageUtil.h"
 #include "Material.h"
 #include "MathUtil.h"
 #include "Texture.h"
@@ -36,7 +37,7 @@ void randomSpheres() {
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
 	auto world = HittableList();
-	auto checker = std::make_shared<CheckerTexture>(0.5, Color{0.1, 0.1, 0.1}, Color{0.9, 0.9, 0.9});
+	auto checker = std::make_shared<CheckerTexture>(0.1, Color{0.05, 0.1, 0.1}, Color{0.9, 0.9, 0.9});
 	auto ground_material = std::make_shared<Lambertian>(Lambertian(checker));
 	auto left_ball_material = std::make_shared<Lambertian>(Color{0.357, 0.816, 0.98});
 	auto center_ball_material = std::make_shared<Metal>(Metal(Color{0.965, 0.671, 0.729}, 0.4));
@@ -183,4 +184,52 @@ void rotationTest() {
 		render(world, camera, "frame_" + std::to_string(i) + "_" + std::string(camera.getRotation()) + ".ppm",
 			   std::string(IMG_OUTPUT_DIR) + "/psi");
 	}
+}
+
+void quads() {
+	HittableList world;
+
+	auto blue = std::make_shared<Lambertian>(Color{0.36, 0.81, 0.98});
+	auto pink = std::make_shared<Lambertian>(Color{0.96, 0.66, 0.72});
+	auto white = std::make_shared<Lambertian>(Color{1, 1, 1});
+
+	world.add(
+			std::make_shared<Quad>(Point3{-3, -2, 5}, AppleMath::Vector3{0, 0, -4}, AppleMath::Vector3{0, 4, 0}, blue));
+	world.add(
+			std::make_shared<Quad>(Point3{-2, -2, 0}, AppleMath::Vector3{4, 0, 0}, AppleMath::Vector3{0, 4, 0}, white));
+	world.add(std::make_shared<Quad>(Point3{3, -2, 1}, AppleMath::Vector3{0, 0, 4}, AppleMath::Vector3{0, 4, 0}, pink));
+	world.add(std::make_shared<Quad>(Point3{-2, 3, 1}, AppleMath::Vector3{4, 0, 0}, AppleMath::Vector3{0, 0, 4}, blue));
+	world.add(
+			std::make_shared<Quad>(Point3{-2, -3, 5}, AppleMath::Vector3{4, 0, 0}, AppleMath::Vector3{0, 0, -4}, pink));
+	Camera camera(1920, 9.0 / 9.0, 90, {0, 0, 9}, {0, 0, 0}, 0);
+	camera.setSampleCount(100);
+	camera.setShutterSpeed(1.0 / 24.0);
+	camera.setRenderDepth(50);
+	camera.setRenderThreadCount(12);
+	camera.setChunkDimension(64);
+	render(world, camera, "quads.ppm");
+}
+
+void triangles() {
+	HittableList world;
+
+	auto blue = std::make_shared<Lambertian>(Color{0.36, 0.81, 0.98});
+	auto pink = std::make_shared<Lambertian>(Color{0.96, 0.66, 0.72});
+	auto white = std::make_shared<Lambertian>(Color{1, 1, 1});
+
+	Point3 p1{1.5, 1.5, 0};
+	Point3 p2{-1.5, -1.5, 0};
+	AppleMath::Vector3 vertical{3, 0, 0};
+	AppleMath::Vector3 horizontal{0, 3, 0};
+
+
+	world.add(std::make_shared<Triangle>(p1, -vertical, -horizontal, blue));
+	world.add(std::make_shared<Triangle>(p2, vertical, horizontal, pink));
+	Camera camera(1920, 9.0 / 9.0, 90, {0, 0, 5}, {0, 0, 0}, 0);
+	camera.setSampleCount(100);
+	camera.setShutterSpeed(1.0 / 24.0);
+	camera.setRenderDepth(50);
+	camera.setRenderThreadCount(12);
+	camera.setChunkDimension(64);
+	render(world, camera, "triangle.ppm");
 }

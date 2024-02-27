@@ -138,5 +138,31 @@ private:
 	
 };
 
+class Triangle : public IHittable {
+public:
+
+	Triangle(const AppleMath::Vector3& Q, const AppleMath::Vector3& u, const AppleMath::Vector3& v, std::shared_ptr<IMaterial> mat);
+
+	virtual ~Triangle() = default;
+
+	virtual void setBoundingBox();
+
+	AABB boundingBox() const override;
+
+	bool hit(const Ray& r, Interval interval, HitRecord& record) const override;
+
+	bool inside(const AppleMath::Vector3& intersection) const;
+
+private:
+
+	AppleMath::Vector3 Q, u, v;
+	AppleMath::Vector3 normal;
+	AppleMath::Vector3 w;
+	double D;
+
+	std::shared_ptr<IMaterial> mat;
+	AABB box;
+};
+
 
 #endif //ONEWEEKEND_GRAPHICOBJECTS_H
