@@ -10,12 +10,12 @@
 
 #include <limits>
 
-const double PI = 3.141592;
-const double INF = std::numeric_limits<double>::infinity();
-const double EPS = 1e-3;
+const float PI = 3.141592;
+const float INF = std::numeric_limits<float>::infinity();
+const float EPS = 1e-3;
 
 
-inline double deg2Rad(double deg) {
+inline float deg2Rad(float deg) {
     return deg * PI / 180.0;
 }
 

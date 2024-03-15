@@ -8,8 +8,6 @@
 #ifndef RAYTRACING_SCENES_H
 #define RAYTRACING_SCENES_H
 
-
-
 void randomSpheres();
 
 void twoSpheres();
@@ -25,5 +23,11 @@ void rotationTest();
 void quads();
 
 void triangles();
+
+void cornellBox();
+
+void cornellBoxWithObjects();
+
+void entityRotationTest();
 
 #endif // RAYTRACING_SCENES_H

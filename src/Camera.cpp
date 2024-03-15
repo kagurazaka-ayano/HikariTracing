@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include <string>
 #include "AppleMath/Vector.hpp"
+#include "ImageUtil.h"
 #include "Material.h"
 #include "AppleMath/Matrix.hpp"
 
@@ -43,7 +44,7 @@ std::string Camera::Render(const IHittable& world, const std::string& name, cons
 	}
 	auto end = std::chrono::system_clock::now();
 	auto time_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
-	spdlog::info("render completed! taken {}s", static_cast<double>(time_elapsed.count()) / 1000.0);
+	spdlog::info("render completed! taken {}s", static_cast<float>(time_elapsed.count()) / 1000.0);
 	auto consumer = KawaiiMQ::Consumer("resultConsumer");
 	consumer.subscribe(result_topic);
 	while(!result_queue->empty()) {
@@ -72,12 +73,13 @@ void Camera::RenderWorker(const IHittable &world) {
 	auto task_topic = KawaiiMQ::Topic("renderTask");
 	auto task_fetcher = KawaiiMQ::Consumer({task_topic});
 	auto task_queue = m->getAllRelatedQueue(task_topic)[0];
-	spdlog::info("thread {} started", ss.str());
 	auto chunk_message = std::shared_ptr<KawaiiMQ::MessageData>();
+	spdlog::info("thread {} started", ss.str());
 	while (task_queue->tryWait(chunk_message)) {
 		auto chunk = KawaiiMQ::getMessage<ImageChunk>(chunk_message);
 		spdlog::info("chunk {} (start from ({}, {}), dimension {} * {}) started by thread {}", chunk.chunk_idx,
 					 chunk.startx, chunk.starty, chunk.width, chunk.height, ss.str());
+		
 		for (int i = chunk.starty; i < chunk.starty + chunk.height; i++) {
 			auto hori = std::vector<Color>();
 			hori.reserve(chunk.width);
@@ -154,7 +156,17 @@ AppleMath::Vector3 Camera::getRotation() const
 	return rotation_rad;
 }
 
-Camera::Camera(int width, double aspect_ratio, double fov, Point3 position, AppleMath::Vector3 target, double dof_angle) : width(width), aspect_ratio(aspect_ratio),
+Color Camera::getBackground() const
+{
+	return background;
+}
+
+void Camera::setBackground(const Color& background)
+{
+	this->background = background;
+}
+
+Camera::Camera(int width, float aspect_ratio, float fov, Point3 position, AppleMath::Vector3 target, float dof_angle) : width(width), aspect_ratio(aspect_ratio),
 	fov(fov), target(std::move(target)),
 	position(std::move(position)),
 	height(static_cast<int>(width / aspect_ratio)), dof_angle(dof_angle){
@@ -170,7 +182,7 @@ void Camera::updateVectors() {
 	auto h = tan(theta / 2);
 	focal_len = (position - target).length();
 	viewport_height = 2 * h * focal_len;
-	viewport_width = viewport_height * (static_cast<double>(width) / height);
+	viewport_width = viewport_height * (static_cast<float>(width) / height);
 	auto rotations = AppleMath::makeEulerRotationMatrixR3(rotation_rad[0], rotation_rad[1], rotation_rad[2]);
 	w = AppleMath::applyTrans({0, 0, 1}, rotations).normalized();
 	auto this_UP = UP;
@@ -197,19 +209,19 @@ int Camera::getHeight() const {
 	return height;
 }
 
-double Camera::getAspectRatio() const {
+float Camera::getAspectRatio() const {
 	return aspect_ratio;
 }
 
-double Camera::getViewportWidth() const {
+float Camera::getViewportWidth() const {
 	return viewport_width;
 }
 
-double Camera::getViewportHeight() const {
+float Camera::getViewportHeight() const {
 	return viewport_height;
 }
 
-double Camera::getFocalLen() const {
+float Camera::getFocalLen() const {
 	return focal_len;
 }
 
@@ -250,7 +262,7 @@ void Camera::setWidth(int width) {
 	updateVectors();
 }
 
-void Camera::setAspectRatio(double aspect_ratio) {
+void Camera::setAspectRatio(float aspect_ratio) {
 	Camera::aspect_ratio = aspect_ratio;
 	height = static_cast<int>(width / aspect_ratio);
 	updateVectors();
@@ -277,23 +289,21 @@ Color Camera::rayColor(const Ray &ray, const IHittable &object, int depth) {
 	if (object.hit(ray, Interval(EPS, INF), record)) {
 		Ray scattered;
 		Color attenuation;
-
+		Color emission = record.material->emitted(record.u, record.v, record.p);
 		if (record.material->scatter(ray, record, attenuation, scattered)) {
-			return attenuation.componentProd(rayColor(scattered, object, depth - 1));
+			return attenuation.componentProd(rayColor(scattered, object, depth - 1)) + emission;
 		}
-		return Color{0, 0, 0};
+		return emission;
 	}
-	auto unit = ray.dir().normalized();
-	return Color{std::min(0.5 * unit[0] + 1, 1.0), std::min(0.5 * unit[1] + 1, 1.0), 1};
-
+	return background;
 }
 
 int Camera::getSampleCount() const {
 	return sample_count;
 }
 AppleMath::Vector3 Camera::randomDisplacement() const {
-	auto delta_x = pix_delta_x * (randomDouble() - 0.5);
-	auto delta_y = pix_delta_y * (randomDouble() - 0.5);
+	auto delta_x = pix_delta_x * (randomFloat() - 0.5);
+	auto delta_y = pix_delta_y * (randomFloat() - 0.5);
 	return delta_x + delta_y;
 }
 
@@ -314,10 +324,10 @@ void Camera::setRenderThreadCount(int renderThreadCount) {
 		render_thread_count = renderThreadCount;
 	}
 }
-void Camera::setFov(double fov) {
+void Camera::setFov(float fov) {
 	this->fov = fov;
 }
-double Camera::getFov() const {
+float Camera::getFov() const {
 	return fov;
 }
 const Point3 &Camera::getTarget() const {
@@ -327,14 +337,14 @@ const Point3 &Camera::getTarget() const {
 void Camera::setTarget(const Point3 &target) {
 	Camera::target = target;
 }
-double Camera::getDofAngle() const {
+float Camera::getDofAngle() const {
 	return dof_angle;
 }
-void Camera::setDofAngle(double dofAngle) {
+void Camera::setDofAngle(float dofAngle) {
 	dof_angle = dofAngle;
 	updateVectors();
 }
-void Camera::setFocalLen(double focalLen) {
+void Camera::setFocalLen(float focalLen) {
 	focal_len = focalLen;
 	updateVectors();
 }
@@ -343,7 +353,7 @@ Ray Camera::getRay(int x, int y) {
 	auto pixel_vec = pixel_00 + pix_delta_x * x + pix_delta_y * y + randomDisplacement();
 	auto origin = dof_angle <= 0 ? position : dofDiskSample();
 	auto direction = pixel_vec - origin;
-	auto time = randomDouble(0, shutter_speed);
+	auto time = randomFloat(0, shutter_speed);
 	return Ray(origin, direction, time);
 }
 int Camera::getChunkDimension() const {
@@ -354,10 +364,10 @@ void Camera::setChunkDimension(int dimension) {
 	chunk_dimension = (dimension > width || dimension > height) ? width / render_thread_count : dimension;
 }
 
-double Camera::getShutterSpeed() const {
+float Camera::getShutterSpeed() const {
 	return shutter_speed;
 }
 
-void Camera::setShutterSpeed(double shutterSpeed) {
+void Camera::setShutterSpeed(float shutterSpeed) {
 	shutter_speed = shutterSpeed;
 }

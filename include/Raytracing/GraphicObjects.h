@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <vector>
+#include "AppleMath/Matrix.hpp"
 #include "AppleMath/Vector.hpp"
 #include "MathUtil.h"
 
@@ -19,9 +20,9 @@ class IMaterial;
 struct HitRecord {
 	bool hit;
 	Point3 p;
-	double t;
-	double u;
-	double v;
+	float t;
+	float u;
+	float v;
 	AppleMath::Vector3 normal;
 	std::shared_ptr<IMaterial> material;
 	bool front_face;
@@ -64,11 +65,11 @@ private:
 
 class Sphere : public IHittable {
 public:
-	Sphere(double radius, AppleMath::Vector3 position, std::shared_ptr<IMaterial> mat);
+	Sphere(float radius, AppleMath::Vector3 position, std::shared_ptr<IMaterial> mat);
 
-	Sphere(double radius, const Point3& init_position, const Point3& final_position, std::shared_ptr<IMaterial> mat);
+	Sphere(float radius, const Point3& init_position, const Point3& final_position, std::shared_ptr<IMaterial> mat);
 
-	AppleMath::Vector3 getPosition(double time) const;
+	AppleMath::Vector3 getPosition(float time) const;
 
 
 
@@ -78,11 +79,11 @@ public:
 
 private:
 
-	static void getSphereUV(const Point3& p, double& u, double& v);
+	static void getSphereUV(const Point3& p, float& u, float& v);
 
 	AppleMath::Vector3 direction_vec;
 	bool is_moving = false;
-	double radius;
+	float radius;
 	AABB bbox;
 	AppleMath::Vector3 position;
 	std::shared_ptr<IMaterial> material;
@@ -126,12 +127,12 @@ public:
 
 	bool hit(const Ray& r, Interval interval, HitRecord& record) const override;
 
-	bool inside(double a, double b, HitRecord& rec) const;
+	bool inside(float a, float b, HitRecord& rec) const;
 
 private:
 	AppleMath::Vector3 Q, u, v;
 	AppleMath::Vector3 normal;
-	double D;
+	float D;
 	AppleMath::Vector3 w;
 	std::shared_ptr<IMaterial> mat;
 	AABB bbox;
@@ -158,11 +159,63 @@ private:
 	AppleMath::Vector3 Q, u, v;
 	AppleMath::Vector3 normal;
 	AppleMath::Vector3 w;
-	double D;
+	float D;
 
 	std::shared_ptr<IMaterial> mat;
 	AABB box;
 };
 
+inline std::shared_ptr<HittableList> box(const Point3& a, const Point3& b, std::shared_ptr<IMaterial> mat) {
+	auto sides = std::make_shared<HittableList>();
+
+	auto min = Point3{std::fmin(a.x(), b.x()), std::fmin(a.y(), b.y()), std::fmin(a.z(), b.z())};
+	auto max = Point3{std::fmax(a.x(), b.x()), std::fmax(a.y(), b.y()), std::fmax(a.z(), b.z())};
+
+	auto dx = AppleMath::Vector3{max.x() - min.x(), 0, 0};
+	auto dy = AppleMath::Vector3{0, max.y() - min.y(), 0};
+	auto dz = AppleMath::Vector3{0, 0, max.z() - min.z()};
+
+    sides->add(make_shared<Quad>(Point3{min.x(), min.y(), max.z()},  dx,  dy, mat)); // front
+    sides->add(make_shared<Quad>(Point3{max.x(), min.y(), max.z()}, -dz,  dy, mat)); // right
+    sides->add(make_shared<Quad>(Point3{max.x(), min.y(), min.z()}, -dx,  dy, mat)); // back
+    sides->add(make_shared<Quad>(Point3{min.x(), min.y(), min.z()},  dz,  dy, mat)); // left
+    sides->add(make_shared<Quad>(Point3{min.x(), max.y(), max.z()},  dx, -dz, mat)); // top
+    sides->add(make_shared<Quad>(Point3{min.x(), min.y(), min.z()},  dx,  dz, mat)); // bottom
+
+
+	return sides;
+}
+
+class Translate : public IHittable {
+public:
+
+	Translate(std::shared_ptr<IHittable> obj, const AppleMath::Vector3& displacement);
+
+	AABB boundingBox() const override;
+
+	bool hit(const Ray& r, Interval interval, HitRecord& record) const override;
+
+
+private:
+	std::shared_ptr<IHittable> object;
+	AppleMath::Vector3 offset;
+	AABB bbox;
+};
+
+class Rotation : public IHittable {
+public:
+
+	Rotation(std::shared_ptr<IHittable> obj, float psi, float theta, float phi, Point3 about_pt);
+
+	AABB boundingBox() const override;
+
+	bool hit(const Ray& r, Interval interval, HitRecord& record) const override;
+
+private:
+
+	std::shared_ptr<IHittable> object;
+	AppleMath::Matrix<4, 4> rotation_matrix, inverse_rotation_matrix;
+	AABB bbox;
+};
 
 #endif //ONEWEEKEND_GRAPHICOBJECTS_H

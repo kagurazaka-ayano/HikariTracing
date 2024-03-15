@@ -5,24 +5,27 @@
  * @brief
  */
 
+#include <cmath>
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_FAILURE_USERMSG
 #include "ImageUtil.h"
 
-std::string getGreyScaleCharacter(double r, double g, double b) {
-	double sum = r * 255.0 * 0.299 + g * 255.0 * 0.587 + b * 255.0 * 0.114;
+std::string getGreyScaleCharacter(float r, float g, float b) {
+	float sum = r * 255.0 * 0.299 + g * 255.0 * 0.587 + b * 255.0 * 0.114;
 	std::stringstream ret;
-	ret << grayscale[static_cast<int>((sum - 1.0) / (255.0 / static_cast<double>(grayscale.size())))];
+	ret << grayscale[static_cast<int>((sum - 1.0) / (255.0 / static_cast<float>(grayscale.size())))];
 	return ret.str();
 }
 
-double gammaCorrect(double c) { return std::pow(c, 1.0 / 2.0); }
+float gammaCorrect(float c) { return std::pow(c, 1.0 / 2.0); }
 
-std::string makePPM(int width, int height, const std::vector<std::vector<Color>> &img, const std::string &name,
-					const std::string &path) {
+
+std::string makePPM(int width, int height, const std::vector<std::vector<Color>> &img,
+					const std::string &name, const std::string &path) {
 	auto fout = std::ofstream();
 	std::string filepath = mkdir(path, name);
 	std::cout << filepath << std::endl;
+
 	fout.open(filepath);
 	fout << "P3\n" << width << ' ' << height << "\n255\n";
 	for (int i = 0; i < height; i++) {

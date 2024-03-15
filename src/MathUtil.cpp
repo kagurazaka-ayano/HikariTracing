@@ -19,26 +19,26 @@ std::ostream &operator<<(std::ostream &out, const AppleMath::Vector3 &other) {
 
 Ray::Ray(AppleMath::Vector3 pos, AppleMath::Vector3 dir) : position(std::move(pos)), direction(std::move(dir)), tm(0) {}
 
-Ray::Ray(AppleMath::Vector3 pos, AppleMath::Vector3 dir, double time) :
+Ray::Ray(AppleMath::Vector3 pos, AppleMath::Vector3 dir, float time) :
 	position(std::move(pos)), direction(std::move(dir)), tm(time) {}
 
-Point3 Ray::at(double t) const { return position + direction * t; }
+Point3 Ray::at(float t) const { return position + direction * t; }
 
 AppleMath::Vector3 Ray::dir() const { return direction; }
 
-double Ray::time() const { return tm; }
+float Ray::time() const { return tm; }
 
 AppleMath::Vector3 Ray::pos() const { return position; }
 Interval::Interval() : min(-INF), max(INF) {}
-Interval::Interval(double min, double max) : min(min), max(max) {}
-bool Interval::within(double x) const { return (min <= x) && (x <= max); }
-bool Interval::surround(double x) const { return (min < x) && (x < max); }
+Interval::Interval(float min, float max) : min(min), max(max) {}
+bool Interval::within(float x) const { return (min <= x) && (x <= max); }
+bool Interval::surround(float x) const { return (min < x) && (x < max); }
 Interval::Interval(const Interval &first, const Interval &second) {
 	min = fmin(first.min, second.min);
 	max = fmax(first.max, second.max);
 }
 
-double Interval::clamp(double x) const {
+float Interval::clamp(float x) const {
 	if (x < min)
 		return min;
 	if (x > max)
@@ -46,7 +46,7 @@ double Interval::clamp(double x) const {
 	return x;
 }
 
-Interval Interval::expand(double delta) {
+Interval Interval::expand(float delta) {
 	auto padding = delta / 2;
 	return Interval(min - padding, max + padding);
 }
@@ -100,17 +100,17 @@ AABB::AABB(const AABB &up, const AABB &down) {
 }
 
 AABB AABB::pad() {
-	double delta = 0.0001;
-	double size_x = x.max - x.min;
-	double size_y = y.max - y.min;
-	double size_z = z.max - z.min;
+	float delta = 0.0001;
+	float size_x = x.max - x.min;
+	float size_y = y.max - y.min;
+	float size_z = z.max - z.min;
 	Interval new_x = (fabs(size_x) >= delta ? x : x.expand(delta));
 	Interval new_y = (fabs(size_y) >= delta ? y : y.expand(delta));
 	Interval new_z = (fabs(size_z) >= delta ? z : z.expand(delta));
 	return AABB(new_x, new_y, new_z);
 }
 
-double Perlin::gradientDotProd(int hash, const AppleMath::Vector3 &pt) const {
+float Perlin::gradientDotProd(int hash, const AppleMath::Vector3 &pt) const {
 	auto x = pt[0];
 	auto y = pt[1];
 	auto z = pt[2];
@@ -152,12 +152,12 @@ double Perlin::gradientDotProd(int hash, const AppleMath::Vector3 &pt) const {
 	}
 }
 
-double Perlin::fade(double t) const { return t * t * t * (t * (t * 6 - 15) + 10); }
+float Perlin::fade(float t) const { return t * t * t * (t * (t * 6 - 15) + 10); }
 
-double Perlin::lerp(double begin, double end, double weight) const { return begin + weight * (end - begin); }
+float Perlin::lerp(float begin, float end, float weight) const { return begin + weight * (end - begin); }
 
-double Perlin::rawNoise(const Point3 &p) const {
-	double x = p[0], y = p[1], z = p[2];
+float Perlin::rawNoise(const Point3 &p) const {
+	float x = p[0], y = p[1], z = p[2];
 	int xi = static_cast<int>(floor(x)) & 255;
 	int yi = static_cast<int>(floor(y)) & 255;
 	int zi = static_cast<int>(floor(z)) & 255;
@@ -174,38 +174,38 @@ double Perlin::rawNoise(const Point3 &p) const {
 	lrf = perm[perm[perm[xi + 1	] + yi		] + zi + 1	];
 	ulf = perm[perm[perm[xi		] + yi + 1	] + zi + 1	]; 
 	urf = perm[perm[perm[xi + 1	] + yi + 1	] + zi + 1	];
-	double dotllb = gradientDotProd(llb, {x		, y		, z		});
-	double dotlrb = gradientDotProd(lrb, {x - 1	, y		, z		});
-	double dotulb = gradientDotProd(ulb, {x		, y - 1	, z		});
-	double doturb = gradientDotProd(urb, {x - 1	, y - 1	, z		});
-	double dotllf = gradientDotProd(llf, {x		, y		, z - 1	});
-	double dotlrf = gradientDotProd(lrf, {x - 1	, y		, z - 1	});
-	double dotulf = gradientDotProd(ulf, {x		, y - 1	, z - 1	});
-	double doturf = gradientDotProd(urf, {x - 1	, y - 1	, z - 1	});
+	float dotllb = gradientDotProd(llb, {x		, y		, z		});
+	float dotlrb = gradientDotProd(lrb, {x - 1	, y		, z		});
+	float dotulb = gradientDotProd(ulb, {x		, y - 1	, z		});
+	float doturb = gradientDotProd(urb, {x - 1	, y - 1	, z		});
+	float dotllf = gradientDotProd(llf, {x		, y		, z - 1	});
+	float dotlrf = gradientDotProd(lrf, {x - 1	, y		, z - 1	});
+	float dotulf = gradientDotProd(ulf, {x		, y - 1	, z - 1	});
+	float doturf = gradientDotProd(urf, {x - 1	, y - 1	, z - 1	});
 
 	x = fade(x);
 	y = fade(y);
 	z = fade(z);
 
 
-	double x0 = lerp(dotllb, dotlrb, x);
-	double x1 = lerp(dotulb, doturb, x);
-	double x2 = lerp(dotllf, dotlrf, x);
-	double x3 = lerp(dotulf, doturf, x);
+	float x0 = lerp(dotllb, dotlrb, x);
+	float x1 = lerp(dotulb, doturb, x);
+	float x2 = lerp(dotllf, dotlrf, x);
+	float x3 = lerp(dotulf, doturf, x);
 
-	double y0 = lerp(x0, x1, y);
-	double y1 = lerp(x2, x3, y);
+	float y0 = lerp(x0, x1, y);
+	float y1 = lerp(x2, x3, y);
 
-	double out = lerp(y0, y1, z);
+	float out = lerp(y0, y1, z);
 
 
 	return out;
 }
 
-double Perlin::octaveNoise(const Point3& p, double frequency, int octave_count, double persistence) const {
-	double sum = 0;
-	double max_value = 0;
-	double amplitude = 1;
+float Perlin::octaveNoise(const Point3& p, float frequency, int octave_count, float persistence) const {
+	float sum = 0;
+	float max_value = 0;
+	float amplitude = 1;
 	for (int i = 0; i < octave_count; ++i) {
 		sum += rawNoise(p * frequency) * amplitude;
 		max_value += amplitude;

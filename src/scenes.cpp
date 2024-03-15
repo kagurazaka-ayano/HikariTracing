@@ -10,6 +10,7 @@
 #include <string>
 #include "AppleMath/Vector.hpp"
 #include "Camera.h"
+#include "GlobUtil.hpp"
 #include "GraphicObjects.h"
 #include "ImageUtil.h"
 #include "Material.h"
@@ -36,13 +37,14 @@ void randomSpheres() {
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
+	camera.setBackground(Color{0.7, 0.8, 1});
 	auto world = HittableList();
 	auto checker = std::make_shared<CheckerTexture>(0.1, Color{0.05, 0.1, 0.1}, Color{0.9, 0.9, 0.9});
 	auto ground_material = std::make_shared<Lambertian>(Lambertian(checker));
 	auto left_ball_material = std::make_shared<Lambertian>(Color{0.357, 0.816, 0.98});
 	auto center_ball_material = std::make_shared<Metal>(Metal(Color{0.965, 0.671, 0.729}, 0.4));
 	auto right_ball_material = std::make_shared<Dielectric>(Dielectric(1.5, Color{0.8, 0.8, 0.8}));
-	world.add(std::make_shared<Sphere>(Sphere(1000, AppleMath::Vector3{0, -1000, -1.0}, ground_material)));
+	world.add(std::make_shared<Quad>(Quad(AppleMath::Vector3{-1000, -1.0, 0}, AppleMath::Vector3{2000, 0, 0}, AppleMath::Vector3{0, 0, -2000}, ground_material)));
 	world.add(std::make_shared<Sphere>(Sphere(1, AppleMath::Vector3{0, 1, 0}, center_ball_material)));
 	world.add(std::make_shared<Sphere>(Sphere(1, AppleMath::Vector3{4, 1, 0}, right_ball_material)));
 	world.add(std::make_shared<Sphere>(Sphere(1, AppleMath::Vector3{-4, 1, 0}, left_ball_material)));
@@ -50,9 +52,9 @@ void randomSpheres() {
 	for (int i = -11; i < 11; i += 2) {
 		for (int j = -11; j < 11; j += 2) {
 			obj++;
-			auto coord = AppleMath::Vector3{(i + randomDouble(-1, 1)), 0.2, (j + randomDouble(-1, 1))};
-			auto displacement = AppleMath::Vector3{0, randomDouble(0, 0), 0};
-			auto material = static_cast<int>(3.0 * randomDouble());
+			auto coord = AppleMath::Vector3{(i + randomFloat(-1, 1)), 0.2, (j + randomFloat(-1, 1))};
+			auto displacement = AppleMath::Vector3{0, randomFloat(0, 0), 0};
+			auto material = static_cast<int>(3.0 * randomFloat());
 			if ((coord - AppleMath::Vector3{0, 1, 0}).length() > 0.9) {
 				AppleMath::Vector3 color = randomVec3().componentProd(randomVec3());
 				std::shared_ptr<IMaterial> sphere_mat;
@@ -62,12 +64,12 @@ void randomSpheres() {
 						world.add(std::make_shared<Sphere>(0.2, coord, coord + displacement, sphere_mat));
 						break;
 					case 1:
-						sphere_mat = std::make_shared<Metal>(color, randomDouble(0.2, 0.5));
+						sphere_mat = std::make_shared<Metal>(color, randomFloat(0.2, 0.5));
 						world.add(std::make_shared<Sphere>(0.2, coord, coord + displacement, sphere_mat));
 						break;
 					case 2:
 						color = randomVec3(0.7, 1);
-						sphere_mat = std::make_shared<Dielectric>(randomDouble(1, 2), color);
+						sphere_mat = std::make_shared<Dielectric>(randomFloat(1, 2), color);
 						world.add(std::make_shared<Sphere>(0.2, coord, coord + displacement, sphere_mat));
 						break;
 					default:
@@ -77,7 +79,7 @@ void randomSpheres() {
 		}
 	}
 	world = HittableList(std::make_shared<BVHNode>(world));
-	render(world, camera, "randomSpheres.ppm");
+	render(world, camera, "randomSpheres1.ppm");
 }
 
 void twoSpheres() {
@@ -87,6 +89,7 @@ void twoSpheres() {
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
+	camera.setBackground(Color{0.7, 0.8, 1});
 
 	auto world = HittableList();
 	auto checker = std::make_shared<CheckerTexture>(2, Color{0.1, 0.1, 0.1}, Color{0.9, 0.9, 0.9});
@@ -104,6 +107,7 @@ void huajiSphere() {
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
+	camera.setBackground(Color{0.7, 0.8, 1});
 	auto world = HittableList();
 	auto huaji_texture = std::make_shared<ImageTexture>("huaji.jpeg");
 	auto huaji_material = std::make_shared<Lambertian>(huaji_texture);
@@ -120,6 +124,7 @@ void perlinSpheres() {
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
+	camera.setBackground(Color{0.7, 0.8, 1});
 	auto tex = std::make_shared<NoiseTexture>(1, 10, 0.5);
 	world.add(std::make_shared<Sphere>(1000, Point3{0, -1000, 0}, std::make_shared<Lambertian>(tex)));
 	world.add(std::make_shared<Sphere>(2, Point3{0, 2, 0}, std::make_shared<Lambertian>(tex)));
@@ -135,6 +140,7 @@ void terrain() {
 	camera.setRenderDepth(4);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
+	camera.setBackground(Color{0.7, 0.8, 1});
 	auto tex = std::make_shared<TerrainTexture>(0.5, 10, 0.5);
 	world.add(std::make_shared<Sphere>(10, Point3{0, 0, 0}, std::make_shared<Lambertian>(tex)));
 
@@ -149,6 +155,7 @@ void rotationTest() {
 	camera.setRenderDepth(4);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
+	camera.setBackground(Color{0.7, 0.8, 1});
 	auto tex = std::make_shared<ImageTexture>("huaji.jpeg");
 	auto mat_posz = std::make_shared<Lambertian>(tex);
 	auto mat_negz = std::make_shared<Lambertian>(Color{0, 0, 0});
@@ -207,6 +214,7 @@ void quads() {
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
+	camera.setBackground(Color{0.7, 0.8, 1});
 	render(world, camera, "quads.ppm");
 }
 
@@ -231,5 +239,101 @@ void triangles() {
 	camera.setRenderDepth(50);
 	camera.setRenderThreadCount(12);
 	camera.setChunkDimension(64);
+	camera.setBackground(Color{0.7, 0.8, 1});
 	render(world, camera, "triangle.ppm");
+}
+
+void cornellBox() {
+	auto red   = std::make_shared<Lambertian>(Color{.65, .05, .05});
+    auto white = std::make_shared<Lambertian>(Color{.73, .73, .73});
+    auto green = std::make_shared<Lambertian>(Color{.12, .45, .15});
+    auto light = std::make_shared<DiffuseLight>(Color{15, 15, 15});
+	HittableList world;
+
+	world.add(std::make_shared<Quad>(Point3{555, 0, 0}, AppleMath::Vector3{0, 555, 0}, AppleMath::Vector3{0, 0, 555}, green));
+	world.add(std::make_shared<Quad>(Point3{0, 0, 0}, AppleMath::Vector3{0, 555, 0}, AppleMath::Vector3{0, 0, 555}, red));
+	world.add(std::make_shared<Quad>(Point3{343, 554, 332}, AppleMath::Vector3{-130, 0, 0}, AppleMath::Vector3{0,0,-105}, light));
+	world.add(std::make_shared<Quad>(Point3{0, 0, 0}, AppleMath::Vector3{555, 0, 0}, AppleMath::Vector3{0, 0, 555}, white));
+	world.add(std::make_shared<Quad>(Point3{555, 555, 555}, AppleMath::Vector3{-555, 0, 0}, AppleMath::Vector3{0, 0, -555}, white));
+	world.add(std::make_shared<Quad>(Point3{0, 0, 555}, AppleMath::Vector3{555, 0, 0}, AppleMath::Vector3{0, 555, 0}, white));
+	
+	Camera camera(1920, 16.0 / 9.0, 40, {278, 278, -800}, {278, 278, 0}, 0);
+	camera.setSampleCount(10000);
+	camera.setShutterSpeed(1.0 / 24.0);
+	camera.setRenderDepth(4);
+	camera.setRenderThreadCount(12);
+	camera.setChunkDimension(64);
+	camera.setBackground(Color{0, 0, 0});
+	
+
+	world = HittableList(std::make_shared<BVHNode>(world));
+
+	render(world, camera, "emptyCornell.ppm");
+
+}
+
+void cornellBoxWithObjects() {
+	auto red   = std::make_shared<Lambertian>(Color{.65, .05, .05});
+	auto white = std::make_shared<Lambertian>(Color{.73, .73, .73});
+	auto green = std::make_shared<Lambertian>(Color{.12, .45, .15});
+	auto light = std::make_shared<DiffuseLight>(Color{15, 15, 15});
+	HittableList world;
+
+	world.add(std::make_shared<Quad>(Point3{555, 0, 0}, AppleMath::Vector3{0, 555, 0}, AppleMath::Vector3{0, 0, 555}, green));
+	world.add(std::make_shared<Quad>(Point3{0, 0, 0}, AppleMath::Vector3{0, 555, 0}, AppleMath::Vector3{0, 0, 555}, red));
+	world.add(std::make_shared<Quad>(Point3{343, 554, 332}, AppleMath::Vector3{-130, 0, 0}, AppleMath::Vector3{0,0,-105}, light));
+	world.add(std::make_shared<Quad>(Point3{0, 0, 0}, AppleMath::Vector3{555, 0, 0}, AppleMath::Vector3{0, 0, 555}, white));
+	world.add(std::make_shared<Quad>(Point3{555, 555, 555}, AppleMath::Vector3{-555, 0, 0}, AppleMath::Vector3{0, 0, -555}, white));
+	world.add(std::make_shared<Quad>(Point3{0, 0, 555}, AppleMath::Vector3{555, 0, 0}, AppleMath::Vector3{0, 555, 0}, white));
+
+	Camera camera(800, 16.0 / 9.0, 40, {278, 278, -800}, {278, 278, 0}, 0);
+	camera.setSampleCount(1000);
+	camera.setShutterSpeed(1.0 / 24.0);
+	camera.setRenderDepth(4);
+	camera.setRenderThreadCount(12);
+	camera.setChunkDimension(64);
+	camera.setBackground(Color{0, 0, 0});
+
+	std::shared_ptr<IHittable> box1 = box(Point3{0, 0, 0}, Point3{165, 330, 165}, white);
+
+	box1 = std::make_shared<Rotation>(box1, 0, deg2Rad(-15), 0, Point3{0, 0, 0});
+	box1 = std::make_shared<Translate>(box1, AppleMath::Vector3{265, 0, 295});
+
+	std::shared_ptr<IHittable> box2 = box(Point3{0, 0, 0}, Point3{165, 165, 165}, white);
+
+	
+
+	box2 = std::make_shared<Rotation>(box2, 0, deg2Rad(18), 0, Point3{0, 0, 0});
+	box2 = std::make_shared<Translate>(box2, AppleMath::Vector3{130, 0, 65});
+
+	world.add(box1);
+	world.add(box2);
+
+	world = HittableList(std::make_shared<BVHNode>(world));
+
+	render(world, camera, "cornell.ppm");
+
+}
+
+void entityRotationTest() {
+
+	auto red   = std::make_shared<Lambertian>(Color{.65, .05, .05});
+	auto white = std::make_shared<Metal>(Color{.73, .73, .73}, 0.3);
+	auto green = std::make_shared<Lambertian>(Color{.12, .45, .15});
+	Camera camera(800, 16.0 / 9.0, 40, {278, 278, -800}, {278, 278, 0}, 0);
+	camera.setSampleCount(200);
+	camera.setShutterSpeed(1.0 / 24.0);
+	camera.setRenderDepth(4);
+	camera.setRenderThreadCount(12);
+	camera.setChunkDimension(64);
+	camera.setBackground(Color{0xad / 255.0, 0xd8 / 255.0, 0xe6 / 255.0});
+
+	for (int i = 0; i <= 36; i += 1) {auto object = box({80, 80, 80}, {-80, -80, -80}, white);
+		auto rot = std::make_shared<Rotation>(object, 0, deg2Rad(i * 10), 0, Point3{0, 0, 0});
+		HittableList world;
+		world.add(std::make_shared<Quad>(Point3{555, 0, 0}, AppleMath::Vector3{0, 555, 0}, AppleMath::Vector3{0, 0, 555}, red));
+		world.add(std::make_shared<Quad>(Point3{0, 0, 0}, AppleMath::Vector3{0, 555, 0}, AppleMath::Vector3{0, 0, 555}, green));
+		world.add(rot);
+		render(world, camera, fmt::format("rotation_frame_{}.ppm", i), std::string(IMG_OUTPUT_DIR) + "/entityRotationTest");
+	}
 }

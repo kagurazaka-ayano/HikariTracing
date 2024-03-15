@@ -2,7 +2,7 @@
 
 int main() {
 
-	switch (7) {
+	switch (9) {
 		case 0:
 			randomSpheres();
 			break;
@@ -26,6 +26,15 @@ int main() {
 			break;
 		case 7:
 			triangles();
+			break;
+		case 8:
+			cornellBox();
+			break;
+		case 9:
+			cornellBoxWithObjects();
+			break;
+		case 10:
+			entityRotationTest();
 			break;
 		default:
 			break;

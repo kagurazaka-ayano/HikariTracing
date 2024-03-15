@@ -7,12 +7,15 @@
 
 
 #include "GraphicObjects.h"
+#include <memory>
+#include <simd/matrix.h>
+#include "AppleMath/Matrix.hpp"
 #include "AppleMath/Vector.hpp"
 #include "Material.h"
 #include "MathUtil.h"
 
 
-Sphere::Sphere(double radius, AppleMath::Vector3 position, std::shared_ptr<IMaterial> mat) :
+Sphere::Sphere(float radius, AppleMath::Vector3 position, std::shared_ptr<IMaterial> mat) :
 	radius(radius), position(std::move(position)), material(std::move(mat)) {
 	auto rvec = AppleMath::Vector3{radius, radius, radius};
 	bbox = AABB(this->position - rvec, this->position + rvec);
@@ -46,9 +49,9 @@ bool Sphere::hit(const Ray &r, Interval interval, HitRecord &record) const {
 	return true;
 }
 
-void Sphere::getSphereUV(const Point3 &p, double &u, double &v) {
-	double theta = std::acos(-p[1]);
-	double phi = std::atan2(-p[2], p[0]) + PI;
+void Sphere::getSphereUV(const Point3 &p, float &u, float &v) {
+	float theta = std::acos(-p[1]);
+	float phi = std::atan2(-p[2], p[0]) + PI;
 	u = phi / (2 * PI);
 	v = theta / PI;
 }
@@ -94,7 +97,7 @@ auto HittableList::begin() { return objects.begin(); }
 AABB HittableList::boundingBox() const { return bbox; }
 
 
-Sphere::Sphere(double radius, const Point3 &init_position, const Point3 &final_position,
+Sphere::Sphere(float radius, const Point3 &init_position, const Point3 &final_position,
 			   std::shared_ptr<IMaterial> mat) :
 	radius(radius),
 	position(init_position), material(std::move(mat)) {
@@ -106,7 +109,7 @@ Sphere::Sphere(double radius, const Point3 &init_position, const Point3 &final_p
 	bbox = AABB(bbox1, bbox2);
 }
 
-AppleMath::Vector3 Sphere::getPosition(double time) const {
+AppleMath::Vector3 Sphere::getPosition(float time) const {
 	return is_moving ? position + time * direction_vec : position;
 }
 
@@ -182,7 +185,7 @@ Quad::Quad(const AppleMath::Vector3 &Q, const AppleMath::Vector3 &u, const Apple
 	setBoundingBox();
 }
 
-bool Quad::inside(double a, double b, HitRecord &rec) const {
+bool Quad::inside(float a, float b, HitRecord &rec) const {
 	if (a < 0 || a > 1 || b < 0 || b > 1)
 		return false;
 	rec.u = a;
@@ -192,7 +195,7 @@ bool Quad::inside(double a, double b, HitRecord &rec) const {
 
 
 bool Quad::hit(const Ray &r, Interval interval, HitRecord &record) const {
-	double denom = normal.dot(r.dir());
+	float denom = normal.dot(r.dir());
 	if (fabs(denom) < 1e-8) {
 		return false;
 	}
@@ -227,9 +230,7 @@ Triangle::Triangle(const AppleMath::Vector3 &Q, const AppleMath::Vector3 &u, con
 
 void Triangle::setBoundingBox() { box = AABB(Q, Q + u + v).pad(); }
 
-AABB Triangle::boundingBox() const {
-	return box;
-}
+AABB Triangle::boundingBox() const { return box; }
 
 bool Triangle::inside(const AppleMath::Vector3 &intersection) const {
 	auto side1 = v;
@@ -242,8 +243,8 @@ bool Triangle::inside(const AppleMath::Vector3 &intersection) const {
 			side3.cross(dis3).dot(normal) > 0);
 }
 
-bool Triangle::hit(const Ray& r, Interval interval, HitRecord& record) const {
-	double denom = normal.dot(r.dir());
+bool Triangle::hit(const Ray &r, Interval interval, HitRecord &record) const {
+	float denom = normal.dot(r.dir());
 	if (fabs(denom) < 1e-8) {
 		return false;
 	}
@@ -270,4 +271,61 @@ bool Triangle::hit(const Ray& r, Interval interval, HitRecord& record) const {
 	return true;
 }
 
+Translate::Translate(std::shared_ptr<IHittable> obj, const AppleMath::Vector3 &displacement) :
+	object(obj), offset(displacement) {
+	bbox.x = Interval(bbox.x.min + offset.x(), bbox.x.max + offset.x());
+	bbox.y = Interval(bbox.y.min + offset.y(), bbox.y.max + offset.y());
+	bbox.z = Interval(bbox.z.min + offset.z(), bbox.z.max + offset.z());
+}
 
+AABB Translate::boundingBox() const { return bbox; }
+
+bool Translate::hit(const Ray &r, Interval interval, HitRecord &record) const {
+	Ray offset_r = Ray(r.pos() - offset, r.dir(), r.time());
+
+	if (!object->hit(offset_r, interval, record)) {
+		return false;
+	}
+
+
+	record.p += offset;
+
+	return true;
+}
+
+Rotation::Rotation(std::shared_ptr<IHittable> obj, float psi, float theta, float phi, Point3 about_pt) :
+	object(obj), rotation_matrix(AppleMath::makeEulerRotationMatrixAboutPt(about_pt, psi, theta, phi)),
+	inverse_rotation_matrix(AppleMath::makeEulerRotationMatrixAboutPt(about_pt, -psi, -theta, -phi)) {
+	auto bbox_temp = obj->boundingBox();
+	auto min_vec = AppleMath::Vector4{bbox_temp.x.min, bbox_temp.y.min, bbox_temp.z.min, 1};
+	auto max_vec = AppleMath::Vector4{bbox_temp.x.max, bbox_temp.y.max, bbox_temp.z.max, 1};
+	AppleMath::applyTrans(min_vec, rotation_matrix);
+	AppleMath::applyTrans(max_vec, rotation_matrix);
+	auto new_min_vec = AppleMath::deHomonize(min_vec);
+	auto new_max_vec = AppleMath::deHomonize(min_vec);
+	bbox.x = Interval(std::min(bbox_temp.x.min, new_min_vec.x()), std::max(bbox_temp.x.max, new_max_vec.x()));
+	bbox.y = Interval(std::min(bbox_temp.y.min, new_min_vec.y()), std::max(bbox_temp.y.max, new_max_vec.y()));
+	bbox.z = Interval(std::min(bbox_temp.z.min, new_min_vec.z()), std::max(bbox_temp.z.max, new_max_vec.z()));
+}
+
+AABB Rotation::boundingBox() const { return bbox; }
+
+bool Rotation::hit(const Ray &r, Interval interval, HitRecord &record) const {
+	auto origin = r.pos();
+	auto dir = r.dir();
+
+	origin = AppleMath::deHomonize(AppleMath::applyTrans(AppleMath::makeHomoCoord(origin), rotation_matrix));
+	dir = AppleMath::deHomonize(AppleMath::applyTrans(AppleMath::makeHomoCoord(dir), rotation_matrix));
+	Ray rotated(origin, dir, r.time());
+
+	if (!object->hit(rotated, interval, record)) {
+		return false;
+	}
+	auto inverse_transpose = AppleMath::Matrix<4, 4>(simd::transpose(simd::inverse(inverse_rotation_matrix.getData())));
+	record.normal =
+			AppleMath::deHomonize(AppleMath::applyTrans(AppleMath::makeHomoCoord(record.normal), inverse_transpose));
+	record.p = AppleMath::deHomonize(AppleMath::applyTrans(AppleMath::makeHomoCoord(record.p), inverse_rotation_matrix));
+
+
+	return true;
+}

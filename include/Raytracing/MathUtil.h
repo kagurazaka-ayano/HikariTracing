@@ -21,36 +21,36 @@ class Ray {
 private:
 	Point3 position;
 	AppleMath::Vector3 direction;
-	double tm;
+	float tm;
 
 public:
-	Ray(AppleMath::Vector3 pos, AppleMath::Vector3 dir, double time);
+	Ray(AppleMath::Vector3 pos, AppleMath::Vector3 dir, float time);
 	Ray(AppleMath::Vector3 pos, AppleMath::Vector3 dir);
 	Ray() = default;
 
 	AppleMath::Vector3 pos() const;
 	AppleMath::Vector3 dir() const;
-	double time() const;
+	float time() const;
 
-	Point3 at(double t) const;
+	Point3 at(float t) const;
 };
 
 class Interval {
 public:
-	double min, max;
+	float min, max;
 	Interval();
 
-	Interval(double min, double max);
+	Interval(float min, float max);
 
 	Interval(const Interval &first, const Interval &second);
 
-	bool within(double x) const;
+	bool within(float x) const;
 
-	bool surround(double x) const;
+	bool surround(float x) const;
 
-	double clamp(double x) const;
+	float clamp(float x) const;
 
-	Interval expand(double delta);
+	Interval expand(float delta);
 
 	static const Interval empty, universe;
 };
@@ -83,9 +83,9 @@ public:
 
 	~Perlin() = default;
 
-	double rawNoise(const Point3 &p) const;
+	float rawNoise(const Point3 &p) const;
 
-	double octaveNoise(const Point3& p, double frequency, int octave_count, double presistence) const;
+	float octaveNoise(const Point3& p, float frequency, int octave_count, float presistence) const;
 
 private:
 	static constexpr int perm[] = {
@@ -116,28 +116,28 @@ private:
 			128, 195, 78,  66,	215, 61,  156, 180
 	};
 
-	double fade(double x) const;
+	float fade(float x) const;
 
-	double lerp(double begin, double end, double weight) const;
+	float lerp(float begin, float end, float weight) const;
 
-	double gradientDotProd(int hash, const AppleMath::Vector3 &pt) const;
+	float gradientDotProd(int hash, const AppleMath::Vector3 &pt) const;
 };
 
 
-inline double randomDouble() {
-	static std::uniform_real_distribution<double> distribution(0.0, 1.0);
+inline float randomFloat() {
+	static std::uniform_real_distribution<float> distribution(0.0, 1.0);
 	static std::mt19937 generator;
 	return distribution(generator);
 }
 
-inline double randomDouble(double min, double max) { return min + (max - min) * randomDouble(); }
+inline float randomFloat(float min, float max) { return min + (max - min) * randomFloat(); }
 
-inline int randomInt(int min, int max) { return static_cast<int>(randomDouble(min, max + 1)); }
+inline int randomInt(int min, int max) { return static_cast<int>(randomFloat(min, max + 1)); }
 
-inline AppleMath::Vector3 randomVec3() { return AppleMath::Vector3{randomDouble(), randomDouble(), randomDouble()}; }
+inline AppleMath::Vector3 randomVec3() { return AppleMath::Vector3{randomFloat(), randomFloat(), randomFloat()}; }
 
-inline AppleMath::Vector3 randomVec3(double min, double max) {
-	return AppleMath::Vector3{randomDouble(min, max), randomDouble(min, max), randomDouble(min, max)};
+inline AppleMath::Vector3 randomVec3(float min, float max) {
+	return AppleMath::Vector3{randomFloat(min, max), randomFloat(min, max), randomFloat(min, max)};
 }
 
 inline AppleMath::Vector3 randomVec3InUnitSphere() {
@@ -153,7 +153,7 @@ inline AppleMath::Vector3 randomUnitVec3() { return randomVec3InUnitSphere().nor
 
 inline AppleMath::Vector3 randomVec3InUnitDisk() {
 	while (true) {
-		auto p = AppleMath::Vector3{randomDouble(-1, 1), randomDouble(-1, 1), 0};
+		auto p = AppleMath::Vector3{randomFloat(-1, 1), randomFloat(-1, 1), 0};
 		if (p.lengthSq() >= 1)
 			continue;
 		return p;
@@ -172,7 +172,7 @@ inline AppleMath::Vector3 reflect(const AppleMath::Vector3 &v, const AppleMath::
 	return v - 2 * v.dot(n) * n;
 }
 
-inline AppleMath::Vector3 refract(const AppleMath::Vector3 &uv, const AppleMath::Vector3 &n, double etai_over_etat) {
+inline AppleMath::Vector3 refract(const AppleMath::Vector3 &uv, const AppleMath::Vector3 &n, float etai_over_etat) {
 	auto cos_theta = std::fmin(-uv.dot(n), 1.0);
 	AppleMath::Vector3 r_out_perp = etai_over_etat * (uv + cos_theta * n);
 	AppleMath::Vector3 r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_perp.lengthSq())) * n;

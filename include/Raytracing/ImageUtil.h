@@ -46,10 +46,9 @@ private:
 
 const std::string grayscale = " .:-=+*#%@";
 
-std::string getGreyScaleCharacter(double r, double g, double b);
+std::string getGreyScaleCharacter(float r, float g, float b);
 
-std::string makePPM(int width, int height, const std::vector<std::vector<Color>>& img,
-			 const std::string &name, const std::string &path = IMG_OUTPUT_DIR);
+std::string makePPM(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &name, const std::string &path = IMG_OUTPUT_DIR);
 
 std::string makeGrayscaleTxt(int width, int height, const std::vector<std::vector<Color>>& img, const std::string &name, const std::string &path = IMG_OUTPUT_DIR);
 
@@ -61,7 +60,7 @@ std::vector<std::string> split(const std::string& str, const std::string& delime
 
 int clamp(int x, int low, int high);
 
-double gammaCorrect(double c);
+float gammaCorrect(float c);
 
 struct ImageChunk : public KawaiiMQ::MessageData {
 	int startx;
@@ -71,6 +70,8 @@ struct ImageChunk : public KawaiiMQ::MessageData {
 	int height;
 	std::vector<std::vector<Color>> partial;
 };
+
+
 
 
 
