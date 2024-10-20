@@ -17,7 +17,7 @@ class IMaterial {
 public:
 	virtual ~IMaterial() = default;
 
-	virtual bool scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
+	virtual bool scatter(const Ray &r_in, const HitRecord &record, Eigen::Vector3d &attenuation,
 						 Ray &scattered) const = 0;
 	
 	virtual Color emitted(float u, float v, const Point3& p) const;
@@ -29,7 +29,7 @@ public:
 
 	Lambertian(std::shared_ptr<ITexture> tex);
 
-	bool scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
+	bool scatter(const Ray &r_in, const HitRecord &record, Eigen::Vector3d &attenuation,
 				 Ray &scattered) const override;
 
 private:
@@ -43,7 +43,7 @@ public:
 
 	Metal(const Color& abledo, float fuzz);
 
-	bool scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
+	bool scatter(const Ray &r_in, const HitRecord &record, Eigen::Vector3d &attenuation,
 				 Ray &scattered) const override;
 
 private:
@@ -57,7 +57,7 @@ public:
 
 	Dielectric(float idx, const Color& albedo);
 
-	bool scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
+	bool scatter(const Ray &r_in, const HitRecord &record, Eigen::Vector3d &attenuation,
 				 Ray &scattered) const override;
 private:
 	float ir;
@@ -71,7 +71,7 @@ public:
 
 	DiffuseLight(Color c);
 
-	bool scatter(const Ray &r_in, const HitRecord &record, AppleMath::Vector3 &attenuation,
+	bool scatter(const Ray &r_in, const HitRecord &record, Eigen::Vector3d &attenuation,
 				 Ray &scattered) const override;
 	
 	Color emitted(float u, float v, const Point3& p) const override;

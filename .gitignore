@@ -55,3 +55,7 @@ img/output
 
 # counter
 .VSCodeCounter
+
+compile_commands.json
+
+out

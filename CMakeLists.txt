@@ -4,7 +4,13 @@ include(FetchContent)
 
 set(CMAKE_CXX_STANDARD 23)
 
-set(CMAKE_GENERATOR "Ninja" CACHE INTERNAL "Ninja" FORCE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_GENERATOR
+    "Ninja"
+    CACHE INTERNAL "Ninja" FORCE)
+set(CMAKE_CXX_COMPILER
+	"clang++"
+	CACHE INTERNAL "clang++" FORCE)
 
 file(GLOB SRC_NORMAL "./src/*.cpp")
 file(GLOB SRC_NORMAL_NO_MAIN "./src/*.cpp")
@@ -21,26 +27,30 @@ file(MAKE_DIRECTORY ${IMG_OUT})
 
 FetchContent_Declare(
   spdlog
-  GIT_REPOSITORY https://github.com/gabime/spdlog.git
+  GIT_REPOSITORY https://github.com/gabime/spdlog
   GIT_TAG v1.x)
 FetchContent_MakeAvailable(spdlog)
 list(APPEND INCLUDE_THIRDPARTIES ${spdlog_SOURCE_DIR}/include)
 
 FetchContent_Declare(
-  math
-  GIT_REPOSITORY https://github.com/kagurazaka-ayano/AppleMath.git
-  GIT_TAG main)
-FetchContent_MakeAvailable(math)
+	eigen
+	GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+	GIT_TAG master
+)
+FetchContent_MakeAvailable(eigen)
+list(APPEND INCLUDE_THIRDPARTIES ${eigen_SOURCE_DIR})
+link_libraries(Eigen3::Eigen)
+
 list(APPEND INCLUDE_SELF ${math_SOURCE_DIR}/include)
 FetchContent_Declare(
   stb
-  GIT_REPOSITORY https://github.com/nothings/stb.git
+  GIT_REPOSITORY https://github.com/nothings/stb
   GIT_TAG master)
 FetchContent_MakeAvailable(stb)
 list(APPEND INCLUDE_SELF ${stb_SOURCE_DIR})
 FetchContent_Declare(
   KawaiiMQ
-  GIT_REPOSITORY https://github.com/kagurazaka-ayano/KawaiiMq.git
+  GIT_REPOSITORY https://github.com/kagurazaka-ayano/KawaiiMq
   GIT_TAG main)
 FetchContent_MakeAvailable(KawaiiMQ)
 list(APPEND INCLUDE_SELF ${KawaiiMQ_SOURCE_DIR}/include)

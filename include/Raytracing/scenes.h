@@ -20,6 +20,8 @@ void terrain();
 
 void rotationTest();
 
+void targetingTest();
+
 void quads();
 
 void triangles();
