@@ -15,7 +15,6 @@ set(CMAKE_CXX_COMPILER
 file(GLOB SRC_NORMAL "./src/*.cpp")
 file(GLOB SRC_NORMAL_NO_MAIN "./src/*.cpp")
 list(FILTER SRC_NORMAL_NO_MAIN EXCLUDE REGEX ".*main.cpp")
-file(GLOB SRC_METAL "./src/metal/*.cpp")
 set(INCLUDE_SELF "./include/Raytracing/")
 set(IMG_IN "${CMAKE_SOURCE_DIR}/img/input")
 set(IMG_OUT "${CMAKE_SOURCE_DIR}/img/output")
@@ -31,6 +30,7 @@ FetchContent_Declare(
   GIT_TAG v1.x)
 FetchContent_MakeAvailable(spdlog)
 list(APPEND INCLUDE_THIRDPARTIES ${spdlog_SOURCE_DIR}/include)
+link_libraries(spdlog::spdlog)
 
 FetchContent_Declare(
 	eigen
@@ -41,7 +41,6 @@ FetchContent_MakeAvailable(eigen)
 list(APPEND INCLUDE_THIRDPARTIES ${eigen_SOURCE_DIR})
 link_libraries(Eigen3::Eigen)
 
-list(APPEND INCLUDE_SELF ${math_SOURCE_DIR}/include)
 FetchContent_Declare(
   stb
   GIT_REPOSITORY https://github.com/nothings/stb

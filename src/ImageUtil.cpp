@@ -6,6 +6,7 @@
  */
 
 #include <cmath>
+#include <sys/fcntl.h>
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_FAILURE_USERMSG
 #include "ImageUtil.h"
@@ -20,8 +21,8 @@ std::string getGreyScaleCharacter(float r, float g, float b) {
 float gammaCorrect(float c) { return std::pow(c, 1.0 / 2.0); }
 
 
-std::string makePPM(int width, int height, const std::vector<std::vector<Color>> &img,
-					const std::string &name, const std::string &path) {
+std::string makePPM(int width, int height, const std::vector<std::vector<Color>> &img, const std::string &name,
+					const std::string &path) {
 	auto fout = std::ofstream();
 	std::string filepath = mkdir(path, name);
 	std::cout << filepath << std::endl;
