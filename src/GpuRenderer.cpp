@@ -32,6 +32,5 @@ GpuRenderer::GpuImage GpuRenderer::render(const IHittable &world, const Camera &
 		float wx, wy, wz, pad3;
 		float pixel00x, pixel00y, pixel00z, pad4;
 		float dxx, dxy, dxz, pad5;
-		float d
 	};
 }

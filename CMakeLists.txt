@@ -9,8 +9,8 @@ set(CMAKE_GENERATOR
     "Ninja"
     CACHE INTERNAL "Ninja" FORCE)
 set(CMAKE_CXX_COMPILER
-	"clang++"
-	CACHE INTERNAL "clang++" FORCE)
+    "clang++"
+    CACHE INTERNAL "clang++" FORCE)
 
 file(GLOB SRC_NORMAL "./src/*.cpp")
 file(GLOB SRC_NORMAL_NO_MAIN "./src/*.cpp")
@@ -18,6 +18,9 @@ list(FILTER SRC_NORMAL_NO_MAIN EXCLUDE REGEX ".*main.cpp")
 set(INCLUDE_SELF "./include/Raytracing/")
 set(IMG_IN "${CMAKE_SOURCE_DIR}/img/input")
 set(IMG_OUT "${CMAKE_SOURCE_DIR}/img/output")
+set(DAWN_BUILD_MONOLITHIC_LIBRARY
+    STATIC
+    CACHE INTERNAL STATIC FORCE)
 set(KawaiiMQ_BUILD_TESTS
     OFF
     CACHE BOOL "Build tests")
@@ -33,10 +36,9 @@ list(APPEND INCLUDE_THIRDPARTIES ${spdlog_SOURCE_DIR}/include)
 link_libraries(spdlog::spdlog)
 
 FetchContent_Declare(
-	eigen
-	GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
-	GIT_TAG master
-)
+  eigen
+  GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+  GIT_TAG master)
 FetchContent_MakeAvailable(eigen)
 list(APPEND INCLUDE_THIRDPARTIES ${eigen_SOURCE_DIR})
 link_libraries(Eigen3::Eigen)
