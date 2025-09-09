@@ -1,8 +1,9 @@
+#include <cstdlib>
 #include "scenes.h"
 
-int main() {
+int main(int argc, char **argv) {
 
-	switch (9) {
+	switch (std::atoi(argv[1])) {
 		case 0:
 			randomSpheres();
 			break;
@@ -32,12 +33,6 @@ int main() {
 			break;
 		case 9:
 			cornellBoxWithObjects();
-			break;
-		case 10:
-			rotationTest();
-			break;
-		case 11:
-			targetingTest();
 			break;
 		default:
 			break;
