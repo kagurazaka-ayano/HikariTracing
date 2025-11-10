@@ -1,8 +1,34 @@
 #include <cstdlib>
+#include <iostream>
+#include <spdlog/spdlog.h>
 #include "scenes.h"
 
 int main(int argc, char **argv) {
-
+	if (argc != 2) {
+		std::cerr << "Usage: " << argv[0] << " <scene_number>" << std::endl;
+		return 1;
+	}
+	if (std::string(argv[1]) == "all") {
+		spdlog::info("running all scenes");
+		randomSpheres();
+		spdlog::info("randomSpheres done");
+		twoSpheres();
+		spdlog::info("twoSpheres done");
+		huajiSphere();
+		spdlog::info("huajiSpheres done");
+		perlinSpheres();
+		spdlog::info("perlinSpheres done");
+		terrain();
+		spdlog::info("terrain done");
+		quads();
+		spdlog::info("quads done");
+		triangles();
+		spdlog::info("triangles done");
+		cornellBox();
+		spdlog::info("cornellBox done");
+		cornellBoxWithObjects();
+		spdlog::info("cornellBoxWithObjects done");
+	}
 	switch (std::atoi(argv[1])) {
 		case 0:
 			randomSpheres();

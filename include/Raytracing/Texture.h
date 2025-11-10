@@ -14,16 +14,16 @@ class ITexture {
 public:
 	virtual ~ITexture() = default;
 
-	virtual Color value(float u, float v, const Point3& p) const = 0;
+	virtual Color value(float u, float v, const Point3 &p) const = 0;
 };
 
 class SolidColor : public ITexture {
 public:
-	SolidColor(const Color& c);
+	SolidColor(const Color &c);
 
 	SolidColor(float r, float g, float b);
 
-	Color value(float u, float v, const Point3& p) const override;
+	Color value(float u, float v, const Point3 &p) const override;
 
 private:
 	Color color_val;
@@ -33,7 +33,7 @@ class CheckerTexture : public ITexture {
 public:
 	CheckerTexture(float scale, std::shared_ptr<ITexture> even_tex, std::shared_ptr<ITexture> odd_tex);
 
-	CheckerTexture(float scale, const Color& even_color, const Color& odd_color);
+	CheckerTexture(float scale, const Color &even_color, const Color &odd_color);
 
 	Color value(float u, float v, const Point3 &p) const override;
 
@@ -45,7 +45,7 @@ private:
 
 class ImageTexture : public ITexture {
 public:
-	ImageTexture(const std::string& image, const std::string& parent = IMG_INPUT_DIR);
+	ImageTexture(const std::string &image, const std::string &parent = IMG_INPUT_DIR);
 
 	Color value(float u, float v, const Point3 &p) const override;
 
@@ -57,7 +57,8 @@ class NoiseTexture : public ITexture {
 public:
 	NoiseTexture(float frequency, int octave_count, float persistence);
 
-	Color value(float u, float v, const Point3& p) const override;
+	Color value(float u, float v, const Point3 &p) const override;
+
 private:
 	Perlin noise;
 	float frequency;
@@ -69,7 +70,8 @@ class TerrainTexture : public ITexture {
 public:
 	TerrainTexture(float frequency, int octave_count, float persistence);
 
-	Color value(float u, float v, const Point3& p) const override;
+	Color value(float u, float v, const Point3 &p) const override;
+
 private:
 	Perlin noise;
 	float frequency;

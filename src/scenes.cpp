@@ -35,7 +35,7 @@ void randomSpheres() {
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
-	camera.setRenderThreadCount(14);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(120);
 	camera.setBackground(Color{0.7, 0.8, 1});
 	auto world = HittableList();
@@ -88,7 +88,7 @@ void twoSpheres() {
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
-	camera.setRenderThreadCount(12);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(64);
 	camera.setBackground(Color{0.7, 0.8, 1});
 
@@ -102,11 +102,11 @@ void twoSpheres() {
 }
 
 void huajiSphere() {
-	auto camera = Camera(400, 16.0 / 9.0, 45, {30, 0, -30}, {0, 0, 0}, 0.1);
+	auto camera = Camera(400, 16.0 / 9.0, 45, {0, 0, 0}, {0, 0, -30}, 0.1);
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
-	camera.setRenderThreadCount(12);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(64);
 	camera.setBackground(Color{0.7, 0.8, 1});
 	auto world = HittableList();
@@ -123,7 +123,7 @@ void perlinSpheres() {
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
-	camera.setRenderThreadCount(12);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(64);
 	camera.setBackground(Color{0.7, 0.8, 1});
 	auto tex = std::make_shared<NoiseTexture>(1, 10, 0.5);
@@ -154,7 +154,7 @@ void rotationTest() {
 	camera.setSampleCount(10);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(4);
-	camera.setRenderThreadCount(12);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(34);
 	camera.setBackground(Color{0.3, 0.4, 0.5});
 	auto tex = std::make_shared<ImageTexture>("huaji.jpeg");
@@ -261,7 +261,7 @@ void quads() {
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
-	camera.setRenderThreadCount(12);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(64);
 	camera.setBackground(Color{0.7, 0.8, 1});
 	render(world, camera, "quads.ppm");
@@ -285,7 +285,7 @@ void triangles() {
 	camera.setSampleCount(100);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(50);
-	camera.setRenderThreadCount(12);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(64);
 	camera.setBackground(Color{0.7, 0.8, 1});
 	render(world, camera, "triangle.ppm");
@@ -311,7 +311,7 @@ void cornellBox() {
 	camera.setSampleCount(10000);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(4);
-	camera.setRenderThreadCount(12);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(64);
 	camera.setBackground(Color{0, 0, 0});
 
@@ -341,7 +341,7 @@ void cornellBoxWithObjects() {
 	camera.setSampleCount(20);
 	camera.setShutterSpeed(1.0 / 24.0);
 	camera.setRenderDepth(4);
-	camera.setRenderThreadCount(12);
+	camera.setRenderThreadCount(20);
 	camera.setChunkDimension(64);
 	camera.setBackground(Color{0, 0, 0});
 
